@@ -1,0 +1,6 @@
+{
+  "name": "RSRTC Lifeline",
+  "description": "Rajasthan State Road Transport Corporation bus booking, live timetable, and passenger companion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-crimson-50: #FDF2F6;
+  --color-crimson-100: #FCE4EC;
+  --color-crimson-500: #E91E63;
+  --color-crimson-600: #D81B60;
+  --color-crimson-700: #B0124D;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #F5F7FA;
+    color: #0F172A;
+    overflow-x: hidden;
+  }
+}
+
+.rsrtc-gradient {
+  background: linear-gradient(135deg, #C2185B 0%, #D81B60 52%, #E91E63 100%);
+}
+
+.rsrtc-card {
+  background: #FFFFFF;
+  border: 1px solid #EAECEF;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle horizontal scrollbars for carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
