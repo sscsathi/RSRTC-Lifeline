@@ -47,10 +47,50 @@
   scrollbar-width: none;
 }
 
+@keyframes rsrtc-bus-drive-in {
+  0% {
+    transform: translate3d(-44px, 0, 0) rotate(-0.8deg);
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  72% {
+    transform: translate3d(2.5px, 0, 0) rotate(0.9deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  88% {
+    transform: translate3d(-0.6px, 0, 0) rotate(-0.25deg);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes rsrtc-bus-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.rsrtc-bus-drive-in {
+  transform-origin: 55% 78%;
+  animation:
+    rsrtc-bus-drive-in 750ms both,
+    rsrtc-bus-fade-in 220ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .rsrtc-bus-drive-in {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
   }
 }

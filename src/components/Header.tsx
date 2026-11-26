@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="RSRTC Lifeline Home"
             className="flex items-center text-left group cursor-pointer focus-visible:outline-2 focus-visible:outline-white rounded-lg py-1"
           >
-            <BrandLogo size="md" />
+            <BrandLogo size="md" animateBadge />
           </button>
         </div>
 

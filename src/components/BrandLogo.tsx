@@ -4,11 +4,13 @@ interface BrandLogoProps {
   /** Compact height in pixels for the icon badge (32–40px recommended) */
   size?: 'sm' | 'md';
   showSubtitle?: boolean;
+  animateBadge?: boolean;
 }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
   showSubtitle = false,
+  animateBadge = false,
 }) => {
   const iconHeightClass = size === 'sm' ? 'h-8 w-auto' : 'h-8 sm:h-9 w-auto';
   const titleSizeClass =
@@ -21,7 +23,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         viewBox="0 0 144 96"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className={`${iconHeightClass} shrink-0 drop-shadow-[0_0_10px_rgba(255,224,178,0.55)]`}
+        className={`${iconHeightClass} shrink-0 drop-shadow-[0_0_10px_rgba(255,224,178,0.55)]${animateBadge ? ' rsrtc-bus-drive-in' : ''}`}
         aria-hidden="true"
       >
         <defs>
