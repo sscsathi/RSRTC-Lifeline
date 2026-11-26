@@ -16,7 +16,6 @@ import { DrawerModals } from './components/DrawerModals';
 import {
   BusFilterOption,
   BusService,
-  INITIAL_RECENT_SEARCHES,
   PopularRoute,
   RecentSearch,
   generateBusSchedules,
@@ -24,7 +23,22 @@ import {
 } from './data/rsrtcData';
 
 const DEFAULT_TODAY_ISO = '2026-11-26';
-const STORAGE_KEY_RECENT = 'rsrtc_lifeline_recent_v2';
+const STORAGE_KEY_RECENT = 'rsrtc_lifeline_recent_v3';
+
+function isValidRecentSearch(item: unknown): item is RecentSearch {
+  if (!item || typeof item !== 'object') return false;
+  const candidate = item as Record<string, unknown>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.fromId === 'string' &&
+    typeof candidate.toId === 'string' &&
+    typeof candidate.fromName === 'string' &&
+    typeof candidate.toName === 'string' &&
+    typeof candidate.dateIso === 'string' &&
+    typeof candidate.busFilter === 'string' &&
+    typeof candidate.searchedAt === 'string'
+  );
+}
 
 export default function App() {
   const [fromId, setFromId] = useState<string>('deeg');
@@ -41,23 +55,29 @@ export default function App() {
   // Bus Timetable modal
   const [selectedBus, setSelectedBus] = useState<BusService | null>(null);
 
-  // Persisted Recent Searches
+  // Persisted Recent Searches (strictly per-browser localStorage, starts empty for new visitors)
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY_RECENT);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          return parsed.filter(isValidRecentSearch);
+        }
       }
     } catch {
       // ignore storage errors
     }
-    return INITIAL_RECENT_SEARCHES;
+    return [];
   });
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(recentSearches));
+      if (recentSearches.length === 0) {
+        window.localStorage.removeItem(STORAGE_KEY_RECENT);
+      } else {
+        window.localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(recentSearches));
+      }
     } catch {
       // ignore
     }

@@ -406,39 +406,6 @@ export const HERITAGE_BANNERS: HeritageBanner[] = [
   },
 ];
 
-export const INITIAL_RECENT_SEARCHES: RecentSearch[] = [
-  {
-    id: 'rs-1',
-    fromId: 'deeg',
-    toId: 'jaipur-sindhi-camp',
-    fromName: 'Deeg',
-    toName: 'Jaipur (Sindhi Camp)',
-    dateIso: '2026-11-26',
-    busFilter: 'All',
-    searchedAt: '10 mins ago',
-  },
-  {
-    id: 'rs-2',
-    fromId: 'jaipur-sindhi-camp',
-    toId: 'bharatpur',
-    fromName: 'Jaipur (Sindhi Camp)',
-    toName: 'Bharatpur',
-    dateIso: '2026-11-26',
-    busFilter: 'All',
-    searchedAt: '1 hour ago',
-  },
-  {
-    id: 'rs-3',
-    fromId: 'jodhpur',
-    toId: 'jaisalmer',
-    fromName: 'Jodhpur',
-    toName: 'Jaisalmer',
-    dateIso: '2026-11-27',
-    busFilter: 'Express',
-    searchedAt: 'Yesterday',
-  },
-];
-
 export function getCityById(id: string): CityHub {
   const exact = CITY_HUBS.find((c) => c.id === id);
   if (exact) return exact;
