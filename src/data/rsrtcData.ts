@@ -21,7 +21,7 @@ export interface CityHub {
   stand: string;
   depot: string;
   district: string;
-  region: 'East' | 'North' | 'Central' | 'West' | 'South' | 'Southeast';
+  region: 'East' | 'North' | 'Central' | 'West' | 'South' | 'Southeast' | 'Interstate';
   state: string;
   lat: number;
   lng: number;
@@ -37,6 +37,24 @@ export interface RawDatasetRoute {
   duration: string;
   type: string;
   depot: string;
+}
+
+export interface CorridorSchedule {
+  id: string;
+  from: string;
+  to: string;
+  via: string;
+  duration: string;
+  depotFrom: string;
+  depotTo: string;
+  classes: BusCategory[];
+  departures?: string[];
+  customSlots?: { time: string; type: BusCategory }[];
+  frequency?: {
+    start: string;
+    end: string;
+    intervalMins: number;
+  };
 }
 
 export interface RouteStop {
@@ -67,6 +85,7 @@ export interface BusService {
   durationMinutes: number;
   durationLabel: string;
   distanceKm: number;
+  indicativeFare: number;
   boardingPoint: string;
   droppingPoint: string;
   amenities: string[];
@@ -116,6 +135,8 @@ export const RSRTC_HELPLINES = {
 } as const;
 
 export const STATION_NAMES: string[] = [
+  'Abu Road',
+  'Agra (Idgah)',
   'Ajmer',
   'Alwar',
   'Anupgarh',
@@ -128,16 +149,22 @@ export const STATION_NAMES: string[] = [
   'Bhilwara',
   'Bikaner',
   'Bundi',
+  'Chandigarh',
   'Chittorgarh',
   'Churu',
   'Dausa',
   'Deeg',
+  'Delhi (ISBT Kashmere Gate)',
   'Dholpur',
   'Didwana-Kuchaman',
   'Dudu',
   'Dungarpur',
   'Gangapur City',
+  'Gurugram (IFFCO Chowk / Bus Stand)',
+  'Gwalior',
   'Hanumangarh',
+  'Hindaun City',
+  'Indore',
   'Jaipur (Sindhi Camp)',
   'Jaipur Rural',
   'Jaisalmer',
@@ -149,12 +176,17 @@ export const STATION_NAMES: string[] = [
   'Karauli',
   'Kekri',
   'Khairthal-Tijara',
+  'Khetri',
   'Kota',
   'Kotputli-Behror',
+  'Lucknow',
+  'Mathura',
   'Nagaur',
+  'Nathdwara',
   'Neem Ka Thana',
   'Pali',
   'Phalodi',
+  'Pilani',
   'Pratapgarh',
   'Rajsamand',
   'Salumber',
@@ -164,6 +196,7 @@ export const STATION_NAMES: string[] = [
   'Sikar',
   'Sirohi',
   'Sri Ganganagar',
+  'Suratgarh',
   'Tonk',
   'Udaipur',
 ];
@@ -182,10 +215,13 @@ const STATION_META: Record<
     stand: string;
     depot: string;
     region: CityHub['region'];
+    state?: string;
     lat: number;
     lng: number;
   }
 > = {
+  'Abu Road': { code: 'ABR', stand: 'Abu Road Central Bus Stand', depot: 'Abu Road Depot', region: 'West', lat: 24.482, lng: 72.783 },
+  'Agra (Idgah)': { code: 'AGR', stand: 'Idgah Central Bus Stand, Agra', depot: 'Agra Idgah Interstate Stand', region: 'Interstate', state: 'Uttar Pradesh', lat: 27.168, lng: 77.997 },
   Ajmer: { code: 'AJM', stand: 'Ajmer Central Bus Stand', depot: 'Ajmer Depot', region: 'Central', lat: 26.462, lng: 74.639 },
   Alwar: { code: 'ALW', stand: 'Alwar Central Bus Stand', depot: 'Alwar Depot', region: 'East', lat: 27.553, lng: 76.634 },
   Anupgarh: { code: 'ANG', stand: 'Anupgarh Bus Stand', depot: 'Anupgarh Depot', region: 'North', lat: 29.191, lng: 73.209 },
@@ -198,16 +234,22 @@ const STATION_META: Record<
   Bhilwara: { code: 'BHL', stand: 'Bhilwara Central Bus Stand', depot: 'Bhilwara Depot', region: 'Central', lat: 25.347, lng: 74.64 },
   Bikaner: { code: 'BKN', stand: 'Bikaner Central Bus Stand', depot: 'Bikaner Depot', region: 'North', lat: 28.022, lng: 73.311 },
   Bundi: { code: 'BND', stand: 'Bundi Roadways Bus Stand', depot: 'Bundi Depot', region: 'Southeast', lat: 25.43, lng: 75.649 },
+  Chandigarh: { code: 'CHD', stand: 'ISBT Sector 17 / Sector 43', depot: 'Chandigarh ISBT Stand', region: 'Interstate', state: 'Chandigarh', lat: 30.733, lng: 76.779 },
   Chittorgarh: { code: 'CTG', stand: 'Chittorgarh Central Bus Stand', depot: 'Chittorgarh Depot', region: 'South', lat: 24.888, lng: 74.626 },
   Churu: { code: 'CHR', stand: 'Churu Central Bus Stand', depot: 'Churu Depot', region: 'North', lat: 28.292, lng: 74.964 },
   Dausa: { code: 'DSA', stand: 'Dausa Roadways Bus Stand', depot: 'Dausa Depot', region: 'East', lat: 26.892, lng: 76.336 },
   Deeg: { code: 'DEG', stand: 'Deeg Central Bus Stand', depot: 'Deeg Depot', region: 'East', lat: 27.472, lng: 77.326 },
+  'Delhi (ISBT Kashmere Gate)': { code: 'DEL', stand: 'ISBT Kashmere Gate / Dhaula Kuan', depot: 'RSRTC Delhi Depot (ISBT)', region: 'Interstate', state: 'Delhi NCR', lat: 28.667, lng: 77.228 },
   Dholpur: { code: 'DLP', stand: 'Dholpur Central Bus Stand', depot: 'Dholpur Depot', region: 'East', lat: 26.702, lng: 77.893 },
   'Didwana-Kuchaman': { code: 'DDW', stand: 'Didwana-Kuchaman Bus Stand', depot: 'Didwana Depot', region: 'Central', lat: 27.397, lng: 74.573 },
   Dudu: { code: 'DDU', stand: 'Dudu Highway Bus Stand', depot: 'Ajmer Depot', region: 'Central', lat: 26.682, lng: 75.235 },
   Dungarpur: { code: 'DGP', stand: 'Dungarpur Central Bus Stand', depot: 'Dungarpur Depot', region: 'South', lat: 23.843, lng: 73.714 },
   'Gangapur City': { code: 'GGC', stand: 'Gangapur City Bus Stand', depot: 'Gangapur City Depot', region: 'East', lat: 26.473, lng: 76.724 },
+  'Gurugram (IFFCO Chowk / Bus Stand)': { code: 'GGN', stand: 'IFFCO Chowk & Gurugram Bus Stand', depot: 'Gurugram Interstate Stand', region: 'Interstate', state: 'Haryana', lat: 28.474, lng: 77.072 },
+  Gwalior: { code: 'GWL', stand: 'Gwalior Interstate Bus Stand', depot: 'Gwalior Interstate Stand', region: 'Interstate', state: 'Madhya Pradesh', lat: 26.218, lng: 78.182 },
   Hanumangarh: { code: 'HMG', stand: 'Hanumangarh Junction Bus Stand', depot: 'Hanumangarh Depot', region: 'North', lat: 29.581, lng: 74.329 },
+  'Hindaun City': { code: 'HND', stand: 'Hindaun City Central Bus Stand', depot: 'Hindaun Depot', region: 'East', lat: 26.735, lng: 77.036 },
+  Indore: { code: 'IDR', stand: 'Sarwate / AICTSL Bus Stand, Indore', depot: 'Indore Interstate Stand', region: 'Interstate', state: 'Madhya Pradesh', lat: 22.719, lng: 75.857 },
   'Jaipur (Sindhi Camp)': { code: 'JPR', stand: 'Sindhi Camp Central Bus Stand', depot: 'Jaipur Vaishali Nagar Depot', region: 'Central', lat: 26.922, lng: 75.798 },
   'Jaipur Rural': { code: 'JPRR', stand: 'Chomu / Shahpura Rural Terminal', depot: 'Jaipur Depot', region: 'Central', lat: 27.159, lng: 75.721 },
   Jaisalmer: { code: 'JSM', stand: 'Jaisalmer Golden City Bus Stand', depot: 'Jaisalmer Depot', region: 'West', lat: 26.915, lng: 70.908 },
@@ -219,12 +261,17 @@ const STATION_META: Record<
   Karauli: { code: 'KRL', stand: 'Karauli Central Bus Stand', depot: 'Karauli Depot', region: 'East', lat: 26.498, lng: 77.02 },
   Kekri: { code: 'KKR', stand: 'Kekri Roadways Bus Stand', depot: 'Ajmer Depot', region: 'Central', lat: 25.972, lng: 75.151 },
   'Khairthal-Tijara': { code: 'KHT', stand: 'Khairthal-Tijara Bus Stand', depot: 'Tijara Depot', region: 'East', lat: 27.804, lng: 76.64 },
+  Khetri: { code: 'KTR', stand: 'Khetri Nagar Roadways Bus Stand', depot: 'Khetri Depot', region: 'North', lat: 28.001, lng: 75.792 },
   Kota: { code: 'KOT', stand: 'Nayapura Central Bus Stand', depot: 'Kota Depot', region: 'Southeast', lat: 25.182, lng: 75.864 },
   'Kotputli-Behror': { code: 'KTP', stand: 'Kotputli NH-48 Bus Stand', depot: 'Kotputli Depot', region: 'East', lat: 27.703, lng: 76.199 },
+  Lucknow: { code: 'LKO', stand: 'Alambagh ISBT Bus Terminal', depot: 'Lucknow Interstate Stand', region: 'Interstate', state: 'Uttar Pradesh', lat: 26.813, lng: 80.903 },
+  Mathura: { code: 'MTR', stand: 'Mathura New / Bhuteshwar Bus Stand', depot: 'Mathura Interstate Stand', region: 'Interstate', state: 'Uttar Pradesh', lat: 27.492, lng: 77.673 },
   Nagaur: { code: 'NGR', stand: 'Nagaur Central Bus Stand', depot: 'Nagaur Depot', region: 'Central', lat: 27.202, lng: 73.733 },
+  Nathdwara: { code: 'NTD', stand: 'Nathdwara Roadways Bus Stand', depot: 'Nathdwara / Rajsamand Depot', region: 'South', lat: 24.933, lng: 73.822 },
   'Neem Ka Thana': { code: 'NKT', stand: 'Neem Ka Thana Bus Stand', depot: 'Neem Ka Thana Depot', region: 'North', lat: 27.738, lng: 75.783 },
   Pali: { code: 'PLI', stand: 'Pali Central Bus Stand', depot: 'Pali Depot', region: 'West', lat: 25.771, lng: 73.323 },
   Phalodi: { code: 'PHL', stand: 'Phalodi Roadways Bus Stand', depot: 'Phalodi Depot', region: 'West', lat: 27.131, lng: 72.368 },
+  Pilani: { code: 'PLN', stand: 'Pilani Central Bus Stand', depot: 'Jhunjhunu / Pilani Depot', region: 'North', lat: 28.367, lng: 75.604 },
   Pratapgarh: { code: 'PTG', stand: 'Pratapgarh Central Bus Stand', depot: 'Pratapgarh Depot', region: 'South', lat: 24.032, lng: 74.781 },
   Rajsamand: { code: 'RSM', stand: 'Rajsamand (Kankroli) Bus Stand', depot: 'Rajsamand Depot', region: 'South', lat: 25.067, lng: 73.883 },
   Salumber: { code: 'SLB', stand: 'Salumber Roadways Bus Stand', depot: 'Udaipur Depot', region: 'South', lat: 24.135, lng: 74.045 },
@@ -234,6 +281,7 @@ const STATION_META: Record<
   Sikar: { code: 'SKR', stand: 'Sikar Central Bus Stand', depot: 'Sikar Depot', region: 'North', lat: 27.609, lng: 75.139 },
   Sirohi: { code: 'SRH', stand: 'Sirohi Central Bus Stand', depot: 'Sirohi Depot', region: 'West', lat: 24.882, lng: 72.858 },
   'Sri Ganganagar': { code: 'SGN', stand: 'Sri Ganganagar Central Bus Stand', depot: 'Sri Ganganagar Depot', region: 'North', lat: 29.909, lng: 73.877 },
+  Suratgarh: { code: 'SRG', stand: 'Suratgarh Central Bus Stand', depot: 'Suratgarh Depot', region: 'North', lat: 29.322, lng: 73.899 },
   Tonk: { code: 'TNK', stand: 'Tonk Roadways Bus Stand', depot: 'Tonk Depot', region: 'Southeast', lat: 26.166, lng: 75.788 },
   Udaipur: { code: 'UDR', stand: 'Udiapole Central Bus Stand', depot: 'Udaipur Depot', region: 'South', lat: 24.576, lng: 73.694 },
 };
@@ -248,7 +296,7 @@ export const CITY_HUBS: CityHub[] = STATION_NAMES.map((name) => {
     depot: m?.depot ?? `${name} Depot`,
     district: name.replace(/\s*\(.*?\)\s*/g, ''),
     region: m?.region ?? 'Central',
-    state: 'Rajasthan',
+    state: m?.state ?? 'Rajasthan',
     lat: m?.lat ?? 26.9,
     lng: m?.lng ?? 75.8,
   };
@@ -305,6 +353,603 @@ export const RSRTC_ROUTES: RawDatasetRoute[] = [
   { id: 'RSRTC-48', from: 'Jodhpur', to: 'Barmer', via: 'Balotra - Baytu', departure: '07:30 AM', arrival: '12:30 PM', duration: '5h 00m', type: 'Express', depot: 'Barmer Depot' },
   { id: 'RSRTC-49', from: 'Jodhpur', to: 'Phalodi', via: 'Osian - Lohawat', departure: '08:15 AM', arrival: '11:15 AM', duration: '3h 00m', type: 'Express', depot: 'Phalodi Depot' },
   { id: 'RSRTC-50', from: 'Jodhpur', to: 'Jaisalmer', via: 'Balesar - Pokhran', departure: '07:00 AM', arrival: '12:30 PM', duration: '5h 30m', type: 'Express', depot: 'Jaisalmer Depot' },
+];
+
+/**
+ * Extended bidirectional Rajasthan district & interstate RSRTC corridors
+ * merged alongside RSRTC_ROUTES so every corridor operates cleanly in both A -> B and B -> A directions.
+ */
+export const EXTENDED_CORRIDORS: CorridorSchedule[] = [
+  // 1. KARAULI / HINDAUN CITY CORRIDORS
+  {
+    id: 'CORR-KRL-JPR',
+    from: 'Karauli',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Hindaun - Mahwa - Dausa',
+    duration: '4h 30m',
+    depotFrom: 'Karauli Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express'],
+    departures: ['05:30 AM', '07:00 AM', '09:30 AM', '12:00 PM', '02:30 PM', '05:00 PM', '08:30 PM'],
+  },
+  {
+    id: 'CORR-KRL-BTP',
+    from: 'Karauli',
+    to: 'Bharatpur',
+    via: 'Hindaun - Bayana',
+    duration: '2h 45m',
+    depotFrom: 'Karauli Depot',
+    depotTo: 'Bharatpur Depot',
+    classes: ['Ordinary', 'Express'],
+    departures: ['06:30 AM', '09:00 AM', '12:30 PM', '03:30 PM', '06:00 PM'],
+  },
+  {
+    id: 'CORR-KRL-DEL',
+    from: 'Karauli',
+    to: 'Delhi (ISBT Kashmere Gate)',
+    via: 'Hindaun - Bharatpur - Mathura - Palwal',
+    duration: '6h 30m',
+    depotFrom: 'Karauli Depot',
+    depotTo: 'RSRTC Delhi Depot (ISBT)',
+    classes: ['Express', 'Deluxe'],
+    departures: ['06:00 AM', '08:30 AM', '08:00 PM'],
+  },
+  {
+    id: 'CORR-HND-AGR',
+    from: 'Hindaun City',
+    to: 'Agra (Idgah)',
+    via: 'Bayana - Fatehpur Sikri',
+    duration: '3h 00m',
+    depotFrom: 'Hindaun Depot',
+    depotTo: 'Hindaun Depot',
+    classes: ['Ordinary', 'Express'],
+    departures: ['06:00 AM', '08:30 AM', '11:30 AM', '03:00 PM', '05:30 PM'],
+  },
+
+  // 2. SAWAI MADHOPUR / GANGAPUR CITY CORRIDORS
+  {
+    id: 'CORR-SWM-JPR',
+    from: 'Sawai Madhopur',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Lalsot - Bassi',
+    duration: '3h 30m',
+    depotFrom: 'Sawai Madhopur Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '08:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-SWM-KOT',
+    from: 'Sawai Madhopur',
+    to: 'Kota',
+    via: 'Indragarh - Lakheri',
+    duration: '3h 15m',
+    depotFrom: 'Sawai Madhopur Depot',
+    depotTo: 'Kota Depot',
+    classes: ['Ordinary', 'Express'],
+    departures: ['06:00 AM', '08:30 AM', '11:00 AM', '02:00 PM', '04:30 PM', '07:00 PM'],
+  },
+  {
+    id: 'CORR-GGC-JPR',
+    from: 'Gangapur City',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Lalsot - Dausa',
+    duration: '3h 45m',
+    depotFrom: 'Gangapur City Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '08:00 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-GGC-BTP',
+    from: 'Gangapur City',
+    to: 'Bharatpur',
+    via: 'Hindaun - Bayana',
+    duration: '3h 15m',
+    depotFrom: 'Gangapur City Depot',
+    depotTo: 'Bharatpur Depot',
+    classes: ['Ordinary', 'Express'],
+    departures: ['06:30 AM', '09:30 AM', '01:00 PM', '04:00 PM'],
+  },
+
+  // 3. DHOLPUR CORRIDORS
+  {
+    id: 'CORR-DLP-JPR',
+    from: 'Dholpur',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Agra - Bharatpur - Mahwa - Dausa',
+    duration: '6h 00m',
+    depotFrom: 'Dholpur Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Express', 'Deluxe'],
+    departures: ['06:00 AM', '08:30 AM', '11:30 AM', '03:00 PM', '08:30 PM'],
+  },
+  {
+    id: 'CORR-DLP-AGR',
+    from: 'Dholpur',
+    to: 'Agra (Idgah)',
+    via: 'Mania',
+    duration: '1h 15m',
+    depotFrom: 'Dholpur Depot',
+    depotTo: 'Dholpur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 25 },
+  },
+  {
+    id: 'CORR-DLP-BTP',
+    from: 'Dholpur',
+    to: 'Bharatpur',
+    via: 'Roopwas',
+    duration: '2h 00m',
+    depotFrom: 'Dholpur Depot',
+    depotTo: 'Bharatpur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '06:00 AM', end: '07:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-DLP-GWL',
+    from: 'Dholpur',
+    to: 'Gwalior',
+    via: 'Morena',
+    duration: '1h 30m',
+    depotFrom: 'Dholpur Depot',
+    depotTo: 'Dholpur Depot',
+    classes: ['Express', 'Deluxe'],
+    frequency: { start: '06:00 AM', end: '08:30 PM', intervalMins: 30 },
+  },
+
+  // 4. SHEKHAWATI REGION (JHUNJHUNU, CHURU, PILANI, KHETRI)
+  {
+    id: 'CORR-JJN-JPR',
+    from: 'Jhunjhunu',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Nawalgarh - Sikar - Ringas',
+    duration: '4h 00m',
+    depotFrom: 'Jhunjhunu Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:00 AM', end: '09:00 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-JJN-DEL',
+    from: 'Jhunjhunu',
+    to: 'Delhi (ISBT Kashmere Gate)',
+    via: 'Chirawa - Singhana - Narnaul - Gurugram - Dhaula Kuan',
+    duration: '5h 30m',
+    depotFrom: 'Jhunjhunu Depot',
+    depotTo: 'RSRTC Delhi Depot (ISBT)',
+    classes: ['Express', 'Deluxe'],
+    frequency: { start: '05:00 AM', end: '10:00 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-PLN-DEL',
+    from: 'Pilani',
+    to: 'Delhi (ISBT Kashmere Gate)',
+    via: 'Loharu - Bhiwani / Rewari',
+    duration: '4h 45m',
+    depotFrom: 'Jhunjhunu / Pilani Depot',
+    depotTo: 'RSRTC Delhi Depot (ISBT)',
+    classes: ['Express', 'Deluxe'],
+    departures: ['05:30 AM', '07:30 AM', '10:00 AM', '01:00 PM', '04:00 PM', '08:30 PM'],
+  },
+  {
+    id: 'CORR-CHR-JPR',
+    from: 'Churu',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Fatehpur - Sikar',
+    duration: '4h 30m',
+    depotFrom: 'Churu Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '08:30 PM', intervalMins: 60 },
+  },
+  {
+    id: 'CORR-CHR-BKN',
+    from: 'Churu',
+    to: 'Bikaner',
+    via: 'Ratangarh - Sri Dungargarh',
+    duration: '3h 30m',
+    depotFrom: 'Churu Depot',
+    depotTo: 'Bikaner Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '06:00 AM', end: '08:00 PM', intervalMins: 60 },
+  },
+
+  // 5. HADOTI REGION (BUNDI, BARAN, JHALAWAR)
+  {
+    id: 'CORR-BND-JPR',
+    from: 'Bundi',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Deoli - Tonk',
+    duration: '4h 15m',
+    depotFrom: 'Bundi Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-BND-AJM',
+    from: 'Bundi',
+    to: 'Ajmer',
+    via: 'Kekri - Nasirabad',
+    duration: '3h 45m',
+    depotFrom: 'Bundi Depot',
+    depotTo: 'Ajmer Depot',
+    classes: ['Ordinary', 'Express'],
+    departures: ['06:30 AM', '09:00 AM', '12:00 PM', '03:00 PM', '06:00 PM'],
+  },
+  {
+    id: 'CORR-BRN-KOT',
+    from: 'Baran',
+    to: 'Kota',
+    via: 'Anta',
+    duration: '1h 30m',
+    depotFrom: 'Baran Depot',
+    depotTo: 'Kota Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 25 },
+  },
+  {
+    id: 'CORR-BRN-JPR',
+    from: 'Baran',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Kota - Deoli - Tonk',
+    duration: '6h 15m',
+    depotFrom: 'Baran Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Express', 'Deluxe'],
+    departures: ['06:00 AM', '09:00 AM', '01:00 PM', '08:30 PM'],
+  },
+  {
+    id: 'CORR-JLW-KOT',
+    from: 'Jhalawar',
+    to: 'Kota',
+    via: 'Darah - Suket',
+    duration: '2h 00m',
+    depotFrom: 'Jhalawar Depot',
+    depotTo: 'Kota Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-JLW-IDR',
+    from: 'Jhalawar',
+    to: 'Indore',
+    via: 'Agar - Ujjain',
+    duration: '5h 30m',
+    depotFrom: 'Jhalawar Depot',
+    depotTo: 'Jhalawar Depot',
+    classes: ['Express', 'Deluxe'],
+    departures: ['06:30 AM', '09:30 AM', '02:00 PM', '08:30 PM'],
+  },
+
+  // 6. MEWAR & VAGAD REGION (BHILWARA, CHITTORGARH, BANSWARA, DUNGARPUR, RAJSAMAND, NATHDWARA)
+  {
+    id: 'CORR-BHL-JPR',
+    from: 'Bhilwara',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Nasirabad - Kishangarh',
+    duration: '5h 00m',
+    depotFrom: 'Bhilwara Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe', 'Super Luxury Volvo'],
+    frequency: { start: '05:30 AM', end: '10:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-BHL-UDR',
+    from: 'Bhilwara',
+    to: 'Udaipur',
+    via: 'Gangrar - Chittorgarh',
+    duration: '3h 15m',
+    depotFrom: 'Bhilwara Depot',
+    depotTo: 'Udaipur Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:30 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-CTG-UDR',
+    from: 'Chittorgarh',
+    to: 'Udaipur',
+    via: 'Mangalwar - Dabok',
+    duration: '2h 15m',
+    depotFrom: 'Chittorgarh Depot',
+    depotTo: 'Udaipur Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:30 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-CTG-KOT',
+    from: 'Chittorgarh',
+    to: 'Kota',
+    via: 'Begu - Bijolia',
+    duration: '3h 30m',
+    depotFrom: 'Chittorgarh Depot',
+    depotTo: 'Kota Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '06:00 AM', end: '08:00 PM', intervalMins: 60 },
+  },
+  {
+    id: 'CORR-BSW-UDR',
+    from: 'Banswara',
+    to: 'Udaipur',
+    via: 'Ghatol - Dhariawad / Salumber',
+    duration: '3h 45m',
+    depotFrom: 'Banswara Depot',
+    depotTo: 'Udaipur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '08:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-BSW-JPR',
+    from: 'Banswara',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Pratapgarh - Chittorgarh - Bhilwara - Ajmer',
+    duration: '10h 30m',
+    depotFrom: 'Banswara Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Express', 'Deluxe', 'AC Sleeper'],
+    customSlots: [
+      { time: '06:30 AM', type: 'Express' },
+      { time: '04:30 PM', type: 'Deluxe' },
+      { time: '07:30 PM', type: 'AC Sleeper' },
+    ],
+  },
+  {
+    id: 'CORR-DGP-UDR',
+    from: 'Dungarpur',
+    to: 'Udaipur',
+    via: 'Kherwara - Rishabhdeo',
+    duration: '2h 30m',
+    depotFrom: 'Dungarpur Depot',
+    depotTo: 'Udaipur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '08:30 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-NTD-UDR',
+    from: 'Nathdwara',
+    to: 'Udaipur',
+    via: 'Eklingji',
+    duration: '1h 15m',
+    depotFrom: 'Nathdwara / Rajsamand Depot',
+    depotTo: 'Udaipur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '06:00 AM', end: '09:00 PM', intervalMins: 25 },
+  },
+
+  // 7. MARWAR & WESTERN RAJASTHAN (PALI, SIROHI, ABU ROAD, JALORE, BARMER, JAISALMER, NAGAUR)
+  {
+    id: 'CORR-PLI-JDH',
+    from: 'Pali',
+    to: 'Jodhpur',
+    via: 'Rohat',
+    duration: '1h 30m',
+    depotFrom: 'Pali Depot',
+    depotTo: 'Jodhpur Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '10:00 PM', intervalMins: 20 },
+  },
+  {
+    id: 'CORR-ABR-UDR',
+    from: 'Abu Road',
+    to: 'Udaipur',
+    via: 'Pindwara - Gogunda',
+    duration: '3h 30m',
+    depotFrom: 'Abu Road Depot',
+    depotTo: 'Udaipur Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '06:00 AM', end: '08:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-ABR-JDH',
+    from: 'Abu Road',
+    to: 'Jodhpur',
+    via: 'Sirohi - Sumerpur - Pali',
+    duration: '5h 00m',
+    depotFrom: 'Abu Road Depot',
+    depotTo: 'Jodhpur Depot',
+    classes: ['Express', 'Deluxe'],
+    frequency: { start: '06:00 AM', end: '09:00 PM', intervalMins: 60 },
+  },
+  {
+    id: 'CORR-JLR-JDH',
+    from: 'Jalore',
+    to: 'Jodhpur',
+    via: 'Ahore - Pali / Rohat',
+    duration: '3h 15m',
+    depotFrom: 'Jalore Depot',
+    depotTo: 'Jodhpur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '06:00 AM', end: '08:00 PM', intervalMins: 60 },
+  },
+  {
+    id: 'CORR-BMR-JDH',
+    from: 'Barmer',
+    to: 'Jodhpur',
+    via: 'Balotra - Kalyanpur',
+    duration: '4h 00m',
+    depotFrom: 'Barmer Depot',
+    depotTo: 'Jodhpur Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '10:00 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-JSM-JDH',
+    from: 'Jaisalmer',
+    to: 'Jodhpur',
+    via: 'Pokaran - Balesar',
+    duration: '5h 15m',
+    depotFrom: 'Jaisalmer Depot',
+    depotTo: 'Jodhpur Depot',
+    classes: ['Express', 'Deluxe', 'Super Luxury Volvo'],
+    frequency: { start: '06:00 AM', end: '10:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-JSM-BKN',
+    from: 'Jaisalmer',
+    to: 'Bikaner',
+    via: 'Pokaran - Phalodi - Kolayat',
+    duration: '6h 00m',
+    depotFrom: 'Jaisalmer Depot',
+    depotTo: 'Bikaner Depot',
+    classes: ['Express', 'Deluxe'],
+    departures: ['06:30 AM', '09:30 AM', '01:30 PM', '08:00 PM'],
+  },
+  {
+    id: 'CORR-NGR-JDH',
+    from: 'Nagaur',
+    to: 'Jodhpur',
+    via: 'Khinvsar',
+    duration: '2h 45m',
+    depotFrom: 'Nagaur Depot',
+    depotTo: 'Jodhpur Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-NGR-BKN',
+    from: 'Nagaur',
+    to: 'Bikaner',
+    via: 'Nokha - Deshnok',
+    duration: '2h 15m',
+    depotFrom: 'Nagaur Depot',
+    depotTo: 'Bikaner Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-NGR-JPR',
+    from: 'Nagaur',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Kuchaman - Makrana - Kishangarh',
+    duration: '5h 15m',
+    depotFrom: 'Nagaur Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 60 },
+  },
+
+  // 8. NORTHERN RAJASTHAN (SRI GANGANAGAR, HANUMANGARH, SURATGARH)
+  {
+    id: 'CORR-SGN-BKN',
+    from: 'Sri Ganganagar',
+    to: 'Bikaner',
+    via: 'Suratgarh - Mahajan - Lunkaransar',
+    duration: '4h 30m',
+    depotFrom: 'Sri Ganganagar Depot',
+    depotTo: 'Bikaner Depot',
+    classes: ['Ordinary', 'Express', 'Deluxe'],
+    frequency: { start: '05:30 AM', end: '09:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-SGN-JPR',
+    from: 'Sri Ganganagar',
+    to: 'Jaipur (Sindhi Camp)',
+    via: 'Hanumangarh - Nohar - Churu - Sikar',
+    duration: '9h 30m',
+    depotFrom: 'Sri Ganganagar Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Express', 'Deluxe', 'Super Luxury Volvo'],
+    customSlots: [
+      { time: '06:00 AM', type: 'Express' },
+      { time: '08:30 AM', type: 'Deluxe' },
+      { time: '05:30 PM', type: 'Express' },
+      { time: '07:30 PM', type: 'Deluxe' },
+      { time: '09:00 PM', type: 'Super Luxury Volvo' },
+    ],
+  },
+  {
+    id: 'CORR-HMG-BKN',
+    from: 'Hanumangarh',
+    to: 'Bikaner',
+    via: 'Pilibanga - Suratgarh',
+    duration: '4h 00m',
+    depotFrom: 'Hanumangarh Depot',
+    depotTo: 'Bikaner Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '08:30 PM', intervalMins: 45 },
+  },
+  {
+    id: 'CORR-HMG-DEL',
+    from: 'Hanumangarh',
+    to: 'Delhi (ISBT Kashmere Gate)',
+    via: 'Sirsa - Fatehabad - Hisar - Rohtak',
+    duration: '7h 00m',
+    depotFrom: 'Hanumangarh Depot',
+    depotTo: 'RSRTC Delhi Depot (ISBT)',
+    classes: ['Express', 'Deluxe'],
+    departures: ['06:00 AM', '09:00 AM', '01:00 PM', '08:30 PM'],
+  },
+
+  // 9. EXTRA INTERSTATE CORRIDORS (HARYANA, PUNJAB, UP, MP)
+  {
+    id: 'CORR-ALW-GGN',
+    from: 'Alwar',
+    to: 'Gurugram (IFFCO Chowk / Bus Stand)',
+    via: 'Bhiwadi - Sohna',
+    duration: '2h 30m',
+    depotFrom: 'Alwar Depot',
+    depotTo: 'Alwar Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '05:30 AM', end: '09:00 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-BTP-MTR',
+    from: 'Bharatpur',
+    to: 'Mathura',
+    via: 'Goverdhan / Raraha',
+    duration: '1h 00m',
+    depotFrom: 'Bharatpur Depot',
+    depotTo: 'Bharatpur Depot',
+    classes: ['Ordinary', 'Express'],
+    frequency: { start: '06:00 AM', end: '08:30 PM', intervalMins: 30 },
+  },
+  {
+    id: 'CORR-JPR-CHD',
+    from: 'Jaipur (Sindhi Camp)',
+    to: 'Chandigarh',
+    via: 'Delhi - Panipat - Ambala',
+    duration: '10h 30m',
+    depotFrom: 'Jaipur Vaishali Nagar Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Deluxe', 'Super Luxury Volvo'],
+    customSlots: [
+      { time: '07:00 AM', type: 'Deluxe' },
+      { time: '05:30 PM', type: 'Super Luxury Volvo' },
+      { time: '08:00 PM', type: 'Super Luxury Volvo' },
+    ],
+  },
+  {
+    id: 'CORR-JPR-LKO',
+    from: 'Jaipur (Sindhi Camp)',
+    to: 'Lucknow',
+    via: 'Agra - Kanpur',
+    duration: '11h 30m',
+    depotFrom: 'Jaipur Vaishali Nagar Depot',
+    depotTo: 'Jaipur Vaishali Nagar Depot',
+    classes: ['Deluxe', 'Super Luxury Volvo', 'AC Sleeper'],
+    customSlots: [
+      { time: '05:00 PM', type: 'Deluxe' },
+      { time: '05:00 PM', type: 'Super Luxury Volvo' },
+      { time: '07:30 PM', type: 'AC Sleeper' },
+    ],
+  },
+  {
+    id: 'CORR-KOT-IDR',
+    from: 'Kota',
+    to: 'Indore',
+    via: 'Jhalawar - Agar - Ujjain',
+    duration: '6h 30m',
+    depotFrom: 'Kota Depot',
+    depotTo: 'Kota Depot',
+    classes: ['Express', 'Deluxe', 'Super Luxury Volvo'],
+    customSlots: [
+      { time: '06:30 AM', type: 'Express' },
+      { time: '09:30 AM', type: 'Deluxe' },
+      { time: '02:00 PM', type: 'Express' },
+      { time: '08:30 PM', type: 'Super Luxury Volvo' },
+    ],
+  },
 ];
 
 export const POPULAR_ROUTES: PopularRoute[] = [
@@ -591,6 +1236,19 @@ function buildStopsFromVia(
   ];
 }
 
+function calculateIndicativeFare(distanceKm: number, category: BusCategory): number {
+  const ratePerKm: Record<BusCategory, { rate: number; min: number }> = {
+    Ordinary: { rate: 0.95, min: 35 },
+    Express: { rate: 1.1, min: 45 },
+    Deluxe: { rate: 1.45, min: 70 },
+    'Super Deluxe': { rate: 1.75, min: 95 },
+    'AC Sleeper': { rate: 2.15, min: 180 },
+    'Super Luxury Volvo': { rate: 2.5, min: 220 },
+  };
+  const { rate, min } = ratePerKm[category];
+  return Math.max(min, Math.round((distanceKm * rate) / 5) * 5);
+}
+
 function createBusFromRaw(
   raw: RawDatasetRoute,
   fromCity: CityHub,
@@ -606,6 +1264,7 @@ function createBusFromRaw(
   const arrMins = depMins + durationMinutes;
   const viaText = overrideVia ?? raw.via;
   const { category, filterKey, amenities } = normalizeCategory(raw.type);
+  const indicativeFare = calculateIndicativeFare(distanceKm, category);
   const seed = deterministicHash(`${raw.id}-${overrideIdSuffix ?? 'direct'}-${dateIso}`);
   const series =
     category === 'AC Sleeper'
@@ -632,9 +1291,10 @@ function createBusFromRaw(
     durationMinutes,
     durationLabel: raw.duration,
     distanceKm,
+    indicativeFare,
     boardingPoint: `${fromCity.stand} · Platform ${(seed % 6) + 1}`,
     droppingPoint: toCity.stand,
-    amenities,
+    amenities: [amenities[1] ?? amenities[0], `Est. Fare ~₹${indicativeFare}`, 'Daily Service'],
     stops: buildStopsFromVia(
       fromCity,
       toCity,
@@ -647,6 +1307,75 @@ function createBusFromRaw(
     ),
     onTimePercent: 92 + (seed % 7),
   };
+}
+
+function expandCorridorSchedules(
+  corridor: CorridorSchedule,
+  fromCity: CityHub,
+  toCity: CityHub,
+  isReverse: boolean,
+  dateIso: string
+): BusService[] {
+  const viaText = isReverse
+    ? corridor.via
+        .split(/\s*-\s*/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .reverse()
+        .join(' - ')
+    : corridor.via;
+  const depotName = isReverse ? corridor.depotTo : corridor.depotFrom;
+  const directionTag = isReverse ? 'DN' : 'UP';
+
+  const slots: { depMins: number; type: BusCategory }[] = [];
+
+  if (corridor.customSlots && corridor.customSlots.length > 0) {
+    corridor.customSlots.forEach((slot) => {
+      slots.push({
+        depMins: parseTime12hToMins(slot.time),
+        type: slot.type,
+      });
+    });
+  } else if (corridor.departures && corridor.departures.length > 0) {
+    corridor.departures.forEach((timeStr, idx) => {
+      const depMins = parseTime12hToMins(timeStr);
+      const busClass = corridor.classes[idx % corridor.classes.length];
+      slots.push({ depMins, type: busClass });
+    });
+  } else if (corridor.frequency) {
+    const startMins = parseTime12hToMins(corridor.frequency.start);
+    const endMins = parseTime12hToMins(corridor.frequency.end);
+    const step = Math.max(15, corridor.frequency.intervalMins);
+    let idx = 0;
+    for (let t = startMins; t <= endMins; t += step) {
+      const busClass = corridor.classes[idx % corridor.classes.length];
+      slots.push({ depMins: t, type: busClass });
+      idx += 1;
+    }
+  }
+
+  return slots.map((slot, idx) => {
+    const syntheticRaw: RawDatasetRoute = {
+      id: `${corridor.id}-${directionTag}`,
+      from: fromCity.name,
+      to: toCity.name,
+      via: viaText,
+      departure: formatMinsTo12h(slot.depMins),
+      arrival: formatMinsTo12h(slot.depMins + parseDurationToMins(corridor.duration)),
+      duration: corridor.duration,
+      type: slot.type,
+      depot: depotName,
+    };
+    return createBusFromRaw(
+      syntheticRaw,
+      fromCity,
+      toCity,
+      dateIso,
+      slot.depMins,
+      String(idx + 1).padStart(2, '0'),
+      viaText
+    );
+  });
 }
 
 function chooseMajorTransitHubs(fromCity: CityHub, toCity: CityHub): string[] {
@@ -687,6 +1416,9 @@ function chooseMajorTransitHubs(fromCity: CityHub, toCity: CityHub): string[] {
   if (regions.has('East') && !excluded.has('Dausa')) {
     candidates.push('Dausa');
   }
+  if (regions.has('Interstate') && !excluded.has('Jaipur (Sindhi Camp)')) {
+    candidates.push('Jaipur (Sindhi Camp)');
+  }
 
   // Always guarantee major hubs fallback
   for (const fallback of ['Jaipur (Sindhi Camp)', 'Ajmer', 'Jodhpur']) {
@@ -701,10 +1433,11 @@ function chooseMajorTransitHubs(fromCity: CityHub, toCity: CityHub): string[] {
 }
 
 /**
- * Generates deterministic RSRTC schedules for ANY pair of the 50 Rajasthan districts:
- * 1. Exact direct matches from RSRTC_ROUTES (plus complementary daily return/shift options if only 1 exists)
- * 2. Automatic reverse/return schedule if the opposite direction exists in RSRTC_ROUTES
- * 3. Smart Fallback / Connecting Bus Generator (3–4 schedules: morning, afternoon, evening/night)
+ * Generates deterministic RSRTC schedules for ANY pair of Rajasthan districts & interstate hubs:
+ * 1. Merged bidirectional EXTENDED_CORRIDORS + exact direct matches from RSRTC_ROUTES
+ * 2. Exact direct matches from RSRTC_ROUTES (plus complementary daily shift options)
+ * 3. Automatic reverse/return schedule if the opposite direction exists in RSRTC_ROUTES
+ * 4. Smart Fallback / Connecting Bus Generator (3–4 schedules: morning, afternoon, evening/night)
  *    with logical Rajasthan transit hubs (Jaipur Sindhi Camp, Ajmer, Jodhpur, etc.) so ZERO searches return empty.
  */
 export function generateBusSchedules(
@@ -717,10 +1450,42 @@ export function generateBusSchedules(
 
   if (!fromCity || !toCity || fromCity.id === toCity.id) return [];
 
-  // 1. Exact direct matches from dataset
+  // 0. Bidirectional matches from merged EXTENDED_CORRIDORS
+  const matchingCorridors = EXTENDED_CORRIDORS.filter(
+    (c) =>
+      (c.from === fromCity.name && c.to === toCity.name) ||
+      (c.to === fromCity.name && c.from === toCity.name)
+  );
+
+  // 1. Exact direct matches from original RSRTC_ROUTES
   const exactMatches = RSRTC_ROUTES.filter(
     (r) => r.from === fromCity.name && r.to === toCity.name
   );
+
+  if (matchingCorridors.length > 0) {
+    const corridorBuses: BusService[] = [];
+    matchingCorridors.forEach((corridor) => {
+      const isReverse = corridor.to === fromCity.name && corridor.from === toCity.name;
+      corridorBuses.push(
+        ...expandCorridorSchedules(corridor, fromCity, toCity, isReverse, dateIso)
+      );
+    });
+
+    // Merge any distinct existing RSRTC_ROUTES direct departures so no existing route is ever lost
+    const seenKeys = new Set(
+      corridorBuses.map((b) => `${b.departureMins}-${b.category}-${b.viaText.toLowerCase()}`)
+    );
+    exactMatches.forEach((raw) => {
+      const bus = createBusFromRaw(raw, fromCity, toCity, dateIso);
+      const key = `${bus.departureMins}-${bus.category}-${bus.viaText.toLowerCase()}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        corridorBuses.push(bus);
+      }
+    });
+
+    return corridorBuses.sort((a, b) => a.departureMins - b.departureMins);
+  }
 
   if (exactMatches.length > 0) {
     const directBuses = exactMatches.map((raw) =>
@@ -845,6 +1610,7 @@ export function generateBusSchedules(
       );
       const arrMins = tpl.depMins + durationMinutes;
       const { category, filterKey, amenities } = normalizeCategory(tpl.type);
+      const indicativeFare = calculateIndicativeFare(distanceKm, category);
       const busSeed = deterministicHash(`${fromCity.id}-${toCity.id}-${idx}-${dateIso}`);
       const series =
         category === 'AC Sleeper'
@@ -871,9 +1637,10 @@ export function generateBusSchedules(
         durationMinutes,
         durationLabel: formatDuration(durationMinutes),
         distanceKm,
+        indicativeFare,
         boardingPoint: `${fromCity.stand} · Platform ${(busSeed % 5) + 1}`,
         droppingPoint: toCity.stand,
-        amenities: [...amenities, `Via ${altVia}`],
+        amenities: [amenities[1] ?? amenities[0], `Est. Fare ~₹${indicativeFare}`, `Via ${altVia}`],
         stops: buildStopsFromVia(
           fromCity,
           toCity,
