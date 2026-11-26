@@ -17,41 +17,10 @@ import {
   BusFilterOption,
   BusService,
   PopularRoute,
-  RecentSearch,
   generateBusSchedules,
   findCityById,
-  getCityById,
   getLocalTodayIso,
 } from './data/rsrtcData';
-
-const STORAGE_KEY_RECENT = 'rsrtc_lifeline_recent_searches_v2';
-const LEGACY_RECENT_STORAGE_KEYS = [
-  'rsrtc_lifeline_recent_v3',
-  'rsrtc_lifeline_recent_v2',
-  'rsrtc_lifeline_recent_v1',
-  'rsrtc_lifeline_recent',
-  'rsrtc_lifeline_recent_searches',
-  'rsrtc_lifeline_recent_searches_v1',
-  'rsrtc_recent_searches',
-  'recent_searches',
-];
-
-function isValidRecentSearch(item: unknown): item is RecentSearch {
-  if (!item || typeof item !== 'object') return false;
-  const candidate = item as Record<string, unknown>;
-  return (
-    typeof candidate.id === 'string' &&
-    typeof candidate.fromId === 'string' &&
-    candidate.fromId.length > 0 &&
-    typeof candidate.toId === 'string' &&
-    candidate.toId.length > 0 &&
-    typeof candidate.fromName === 'string' &&
-    typeof candidate.toName === 'string' &&
-    typeof candidate.dateIso === 'string' &&
-    typeof candidate.busFilter === 'string' &&
-    typeof candidate.searchedAt === 'string'
-  );
-}
 
 export default function App() {
   const [todayIso, setTodayIso] = useState<string>(() => getLocalTodayIso());
@@ -81,98 +50,14 @@ export default function App() {
   // Navigation & overlays
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<ActiveModalType>(null);
-  const [recentSheetOpen, setRecentSheetOpen] = useState(false);
 
   // Bus Timetable modal
   const [selectedBus, setSelectedBus] = useState<BusService | null>(null);
-
-  // Persisted Recent Searches (strictly per-browser localStorage, starts empty for new visitors)
-  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() => {
-    try {
-      const saved = window.localStorage.getItem(STORAGE_KEY_RECENT);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(isValidRecentSearch);
-        }
-      }
-    } catch {
-      // ignore storage errors
-    }
-    return [];
-  });
-
-  // Remove any legacy localStorage keys from earlier versions on mount
-  useEffect(() => {
-    try {
-      for (const legacyKey of LEGACY_RECENT_STORAGE_KEYS) {
-        if (legacyKey !== STORAGE_KEY_RECENT) {
-          window.localStorage.removeItem(legacyKey);
-        }
-      }
-      for (let i = window.localStorage.length - 1; i >= 0; i -= 1) {
-        const key = window.localStorage.key(i);
-        if (
-          key &&
-          key !== STORAGE_KEY_RECENT &&
-          (key.startsWith('rsrtc_lifeline_recent') || key.startsWith('rsrtc_recent'))
-        ) {
-          window.localStorage.removeItem(key);
-        }
-      }
-    } catch {
-      // ignore storage errors
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      if (recentSearches.length === 0) {
-        window.localStorage.removeItem(STORAGE_KEY_RECENT);
-      } else {
-        window.localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(recentSearches));
-      }
-    } catch {
-      // ignore
-    }
-  }, [recentSearches]);
 
   const busSchedules = useMemo(
     () => (fromId && toId ? generateBusSchedules(fromId, toId, dateIso) : []),
     [fromId, toId, dateIso]
   );
-
-  const recordSearch = (
-    nextFromId: string,
-    nextToId: string,
-    nextDateIso: string,
-    nextFilter: BusFilterOption
-  ) => {
-    const fromCity = getCityById(nextFromId);
-    const toCity = getCityById(nextToId);
-    const entry: RecentSearch = {
-      id: `${nextFromId}-${nextToId}-${Date.now()}`,
-      fromId: nextFromId,
-      toId: nextToId,
-      fromName: fromCity.name,
-      toName: toCity.name,
-      dateIso: nextDateIso,
-      busFilter: nextFilter,
-      searchedAt: 'Just now',
-    };
-
-    setRecentSearches((prev) => {
-      const deduped = prev.filter(
-        (item) =>
-          !(
-            item.fromId === nextFromId &&
-            item.toId === nextToId &&
-            item.dateIso === nextDateIso
-          )
-      );
-      return [entry, ...deduped].slice(0, 8);
-    });
-  };
 
   const handleChangeDate = (nextIso: string) => {
     const currentToday = getLocalTodayIso();
@@ -202,9 +87,7 @@ export default function App() {
     setToId(validTo.id);
     setDateIso(safeDate);
     setBusFilter(nextFilter);
-    recordSearch(validFrom.id, validTo.id, safeDate, nextFilter);
     setActiveView('results');
-    setRecentSheetOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -215,11 +98,6 @@ export default function App() {
 
   const handleSelectPopularRoute = (route: PopularRoute) => {
     executeSearch(route.fromId, route.toId, dateIso, 'All');
-  };
-
-  const handleSelectRecentSearch = (item: RecentSearch) => {
-    const safeDate = item.dateIso < todayIso ? todayIso : item.dateIso;
-    executeSearch(item.fromId, item.toId, safeDate, item.busFilter);
   };
 
   const handleGoHome = () => {
@@ -289,15 +167,8 @@ export default function App() {
         )}
       </main>
 
-      {/* Pull-Up Recent Searches Sheet */}
-      <RecentSearchesSheet
-        isOpen={recentSheetOpen}
-        onToggle={() => setRecentSheetOpen((open) => !open)}
-        onClose={() => setRecentSheetOpen(false)}
-        searches={recentSearches}
-        onSelectSearch={handleSelectRecentSearch}
-        onClearAll={() => setRecentSearches([])}
-      />
+      {/* Decorative Bottom Bar */}
+      <RecentSearchesSheet />
 
       {/* Left Slide-Out Navigation Drawer */}
       <SlideOutDrawer
