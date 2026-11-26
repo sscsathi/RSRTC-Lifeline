@@ -24,7 +24,17 @@ import {
   getLocalTodayIso,
 } from './data/rsrtcData';
 
-const STORAGE_KEY_RECENT = 'rsrtc_lifeline_recent_v3';
+const STORAGE_KEY_RECENT = 'rsrtc_lifeline_recent_searches_v2';
+const LEGACY_RECENT_STORAGE_KEYS = [
+  'rsrtc_lifeline_recent_v3',
+  'rsrtc_lifeline_recent_v2',
+  'rsrtc_lifeline_recent_v1',
+  'rsrtc_lifeline_recent',
+  'rsrtc_lifeline_recent_searches',
+  'rsrtc_lifeline_recent_searches_v1',
+  'rsrtc_recent_searches',
+  'recent_searches',
+];
 
 function isValidRecentSearch(item: unknown): item is RecentSearch {
   if (!item || typeof item !== 'object') return false;
@@ -91,6 +101,29 @@ export default function App() {
     }
     return [];
   });
+
+  // Remove any legacy localStorage keys from earlier versions on mount
+  useEffect(() => {
+    try {
+      for (const legacyKey of LEGACY_RECENT_STORAGE_KEYS) {
+        if (legacyKey !== STORAGE_KEY_RECENT) {
+          window.localStorage.removeItem(legacyKey);
+        }
+      }
+      for (let i = window.localStorage.length - 1; i >= 0; i -= 1) {
+        const key = window.localStorage.key(i);
+        if (
+          key &&
+          key !== STORAGE_KEY_RECENT &&
+          (key.startsWith('rsrtc_lifeline_recent') || key.startsWith('rsrtc_recent'))
+        ) {
+          window.localStorage.removeItem(key);
+        }
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
 
   useEffect(() => {
     try {
