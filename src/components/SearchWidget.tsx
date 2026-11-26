@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
+  AlertCircle,
 } from 'lucide-react';
 import {
   CITY_HUBS,
@@ -15,7 +16,7 @@ import {
   BusFilterOption,
   formatIsoDateParts,
   shiftIsoDate,
-  getCityById,
+  findCityById,
 } from '../data/rsrtcData';
 
 const BUS_FILTERS: BusFilterOption[] = [
@@ -58,6 +59,11 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
   const [fromQuery, setFromQuery] = useState('');
   const [toQuery, setToQuery] = useState('');
   const [swapTurns, setSwapTurns] = useState(0);
+  const [validationError, setValidationError] = useState<{
+    message: string;
+    missingFrom: boolean;
+    missingTo: boolean;
+  } | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const [y, m] = dateIso.split('-').map(Number);
     return { year: y, month: (m || 11) - 1 };
@@ -65,10 +71,14 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fromCity = getCityById(fromId);
-  const toCity = getCityById(toId);
+  const fromCity = findCityById(fromId);
+  const toCity = findCityById(toId);
   const dateParts = formatIsoDateParts(dateIso);
   const tomorrowIso = shiftIsoDate(todayIso, 1);
+
+  useEffect(() => {
+    setValidationError(null);
+  }, [fromId, toId]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -101,21 +111,63 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
 
   const handleSelectCity = (field: 'from' | 'to', city: CityHub) => {
     if (field === 'from') {
-      if (city.id === toId) {
+      if (toId && city.id === toId) {
         onSwapCities();
       } else {
         onChangeFrom(city.id);
       }
       setFromQuery('');
     } else {
-      if (city.id === fromId) {
+      if (fromId && city.id === fromId) {
         onSwapCities();
       } else {
         onChangeTo(city.id);
       }
       setToQuery('');
     }
+    setValidationError(null);
     setOpenDropdown(null);
+  };
+
+  const handleSearchClick = () => {
+    const missingFrom = !fromCity;
+    const missingTo = !toCity;
+
+    if (missingFrom && missingTo) {
+      setValidationError({
+        message: 'Please select both departure and destination cities before searching.',
+        missingFrom: true,
+        missingTo: true,
+      });
+      return;
+    }
+    if (missingFrom) {
+      setValidationError({
+        message: 'Please select a departure city / bus stand in Leaving From.',
+        missingFrom: true,
+        missingTo: false,
+      });
+      return;
+    }
+    if (missingTo) {
+      setValidationError({
+        message: 'Please select a destination city / bus stand in Going To.',
+        missingFrom: false,
+        missingTo: true,
+      });
+      return;
+    }
+    if (fromCity.id === toCity.id) {
+      setValidationError({
+        message: 'Departure and destination cities must be different.',
+        missingFrom: true,
+        missingTo: true,
+      });
+      return;
+    }
+
+    setValidationError(null);
+    onSearch();
   };
 
   // Calendar grid helpers
@@ -154,7 +206,11 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
           {/* Top Inputs Grid: Responsive 1-col on mobile, 2-col on desktop with centered/right swap */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-stretch">
             {/* From & To Combined Input Block */}
-            <div className="lg:col-span-7 relative rounded-2xl border border-[#EAECEF] bg-[#FAFBFD]">
+            <div
+              className={`lg:col-span-7 relative rounded-2xl border bg-[#FAFBFD] transition-colors ${
+                validationError ? 'border-[#D81B60]/55' : 'border-[#EAECEF]'
+              }`}
+            >
               {/* FROM Input */}
               <div className="relative">
                 <button
@@ -163,7 +219,11 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                     setOpenDropdown(openDropdown === 'from' ? null : 'from');
                     setFromQuery('');
                   }}
-                  className="w-full min-h-[72px] px-4 py-3.5 pr-16 flex items-center gap-3.5 text-left rounded-t-2xl hover:bg-white/90 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#D81B60]"
+                  className={`w-full min-h-[72px] px-4 py-3.5 pr-16 flex items-center gap-3.5 text-left rounded-t-2xl transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#D81B60] ${
+                    validationError?.missingFrom
+                      ? 'bg-[#FDF2F6]/65 hover:bg-[#FDF2F6]/90'
+                      : 'hover:bg-white/90'
+                  }`}
                 >
                   <div className="w-10 h-10 rounded-xl bg-[#FDF2F6] border border-[#FCE4EC] flex items-center justify-center shrink-0">
                     <Building2 className="w-5 h-5 text-[#D81B60]" strokeWidth={2} />
@@ -172,17 +232,29 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                     <span className="block text-xs font-medium text-slate-500">
                       Leaving From
                     </span>
-                    <div className="flex items-baseline gap-2 mt-0.5">
-                      <span className="text-base sm:text-lg font-bold text-slate-900 truncate">
-                        {fromCity.name}
+                    {fromCity ? (
+                      <>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="text-base sm:text-lg font-bold text-slate-900 truncate">
+                            {fromCity.name}
+                          </span>
+                          <span className="text-xs font-mono font-semibold text-slate-400 shrink-0">
+                            {fromCity.code}
+                          </span>
+                        </div>
+                        <span className="block text-xs text-slate-500 truncate mt-0.5">
+                          {fromCity.stand}
+                        </span>
+                      </>
+                    ) : (
+                      <span
+                        className={`block text-sm sm:text-base font-medium truncate mt-1 ${
+                          validationError?.missingFrom ? 'text-[#C2185B]' : 'text-slate-400'
+                        }`}
+                      >
+                        Select departure city / bus stand
                       </span>
-                      <span className="text-xs font-mono font-semibold text-slate-400 shrink-0">
-                        {fromCity.code}
-                      </span>
-                    </div>
-                    <span className="block text-xs text-slate-500 truncate mt-0.5">
-                      {fromCity.stand}
-                    </span>
+                    )}
                   </div>
                 </button>
 
@@ -263,7 +335,11 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                     setOpenDropdown(openDropdown === 'to' ? null : 'to');
                     setToQuery('');
                   }}
-                  className="w-full min-h-[72px] px-4 py-3.5 pr-16 flex items-center gap-3.5 text-left rounded-b-2xl hover:bg-white/90 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#D81B60]"
+                  className={`w-full min-h-[72px] px-4 py-3.5 pr-16 flex items-center gap-3.5 text-left rounded-b-2xl transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-[#D81B60] ${
+                    validationError?.missingTo
+                      ? 'bg-[#FDF2F6]/65 hover:bg-[#FDF2F6]/90'
+                      : 'hover:bg-white/90'
+                  }`}
                 >
                   <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center shrink-0">
                     <MapPin className="w-5 h-5 text-slate-700" strokeWidth={2} />
@@ -272,17 +348,29 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                     <span className="block text-xs font-medium text-slate-500">
                       Going To
                     </span>
-                    <div className="flex items-baseline gap-2 mt-0.5">
-                      <span className="text-base sm:text-lg font-bold text-slate-900 truncate">
-                        {toCity.name}
+                    {toCity ? (
+                      <>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="text-base sm:text-lg font-bold text-slate-900 truncate">
+                            {toCity.name}
+                          </span>
+                          <span className="text-xs font-mono font-semibold text-slate-400 shrink-0">
+                            {toCity.code}
+                          </span>
+                        </div>
+                        <span className="block text-xs text-slate-500 truncate mt-0.5">
+                          {toCity.stand}
+                        </span>
+                      </>
+                    ) : (
+                      <span
+                        className={`block text-sm sm:text-base font-medium truncate mt-1 ${
+                          validationError?.missingTo ? 'text-[#C2185B]' : 'text-slate-400'
+                        }`}
+                      >
+                        Select destination city / bus stand
                       </span>
-                      <span className="text-xs font-mono font-semibold text-slate-400 shrink-0">
-                        {toCity.code}
-                      </span>
-                    </div>
-                    <span className="block text-xs text-slate-500 truncate mt-0.5">
-                      {toCity.stand}
-                    </span>
+                    )}
                   </div>
                 </button>
 
@@ -519,11 +607,22 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
             </div>
           </div>
 
+          {/* Validation Prompt when either city is unselected */}
+          {validationError && (
+            <div
+              role="alert"
+              className="mt-3.5 px-3.5 py-2.5 rounded-xl bg-[#FDF2F6] border border-[#D81B60]/35 text-[#B0124D] flex items-center gap-2.5 text-xs sm:text-sm font-semibold"
+            >
+              <AlertCircle className="w-4 h-4 text-[#D81B60] shrink-0" strokeWidth={2.2} />
+              <span>{validationError.message}</span>
+            </div>
+          )}
+
           {/* Overlapping Primary Crimson-Magenta Search CTA */}
           <div className="absolute left-1/2 -translate-x-1/2 -bottom-7 z-20">
             <button
               type="button"
-              onClick={onSearch}
+              onClick={handleSearchClick}
               className="group min-h-[56px] px-8 sm:px-10 rounded-full rsrtc-gradient text-white font-bold text-sm sm:text-base tracking-tight flex items-center gap-3 shadow-[0_12px_28px_rgba(216,27,96,0.4)] hover:shadow-[0_16px_34px_rgba(216,27,96,0.48)] hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200 cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D81B60]"
             >
               <span className="w-8 h-8 rounded-full bg-white/18 flex items-center justify-center group-hover:scale-105 transition-transform">

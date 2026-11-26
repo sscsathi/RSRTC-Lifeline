@@ -19,6 +19,7 @@ import {
   PopularRoute,
   RecentSearch,
   generateBusSchedules,
+  findCityById,
   getCityById,
 } from './data/rsrtcData';
 
@@ -31,7 +32,9 @@ function isValidRecentSearch(item: unknown): item is RecentSearch {
   return (
     typeof candidate.id === 'string' &&
     typeof candidate.fromId === 'string' &&
+    candidate.fromId.length > 0 &&
     typeof candidate.toId === 'string' &&
+    candidate.toId.length > 0 &&
     typeof candidate.fromName === 'string' &&
     typeof candidate.toName === 'string' &&
     typeof candidate.dateIso === 'string' &&
@@ -41,8 +44,8 @@ function isValidRecentSearch(item: unknown): item is RecentSearch {
 }
 
 export default function App() {
-  const [fromId, setFromId] = useState<string>('deeg');
-  const [toId, setToId] = useState<string>('jaipur-sindhi-camp');
+  const [fromId, setFromId] = useState<string>('');
+  const [toId, setToId] = useState<string>('');
   const [dateIso, setDateIso] = useState<string>(DEFAULT_TODAY_ISO);
   const [busFilter, setBusFilter] = useState<BusFilterOption>('All');
   const [activeView, setActiveView] = useState<'home' | 'results'>('home');
@@ -84,7 +87,7 @@ export default function App() {
   }, [recentSearches]);
 
   const busSchedules = useMemo(
-    () => generateBusSchedules(fromId, toId, dateIso),
+    () => (fromId && toId ? generateBusSchedules(fromId, toId, dateIso) : []),
     [fromId, toId, dateIso]
   );
 
@@ -126,11 +129,16 @@ export default function App() {
     nextDate = dateIso,
     nextFilter = busFilter
   ) => {
-    setFromId(nextFrom);
-    setToId(nextTo);
+    const validFrom = findCityById(nextFrom);
+    const validTo = findCityById(nextTo);
+    if (!validFrom || !validTo || validFrom.id === validTo.id) {
+      return;
+    }
+    setFromId(validFrom.id);
+    setToId(validTo.id);
     setDateIso(nextDate);
     setBusFilter(nextFilter);
-    recordSearch(nextFrom, nextTo, nextDate, nextFilter);
+    recordSearch(validFrom.id, validTo.id, nextDate, nextFilter);
     setActiveView('results');
     setRecentSheetOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });

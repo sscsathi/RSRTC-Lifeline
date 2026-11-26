@@ -406,14 +406,23 @@ export const HERITAGE_BANNERS: HeritageBanner[] = [
   },
 ];
 
-export function getCityById(id: string): CityHub {
+export function findCityById(id: string): CityHub | null {
+  if (!id) return null;
   const exact = CITY_HUBS.find((c) => c.id === id);
   if (exact) return exact;
   // Graceful fallback for older saved IDs like 'jaipur'
   if (id === 'jaipur') {
-    return CITY_HUBS.find((c) => c.id === 'jaipur-sindhi-camp') ?? CITY_HUBS[0];
+    return CITY_HUBS.find((c) => c.id === 'jaipur-sindhi-camp') ?? null;
   }
-  return CITY_HUBS.find((c) => c.id === 'jaipur-sindhi-camp') ?? CITY_HUBS[0];
+  return null;
+}
+
+export function getCityById(id: string): CityHub {
+  return (
+    findCityById(id) ??
+    CITY_HUBS.find((c) => c.id === 'jaipur-sindhi-camp') ??
+    CITY_HUBS[0]
+  );
 }
 
 export function calculateRoadDistanceKm(from: CityHub, to: CityHub): number {
@@ -703,10 +712,10 @@ export function generateBusSchedules(
   toId: string,
   dateIso: string
 ): BusService[] {
-  const fromCity = getCityById(fromId);
-  const toCity = getCityById(toId);
+  const fromCity = findCityById(fromId);
+  const toCity = findCityById(toId);
 
-  if (fromCity.id === toCity.id) return [];
+  if (!fromCity || !toCity || fromCity.id === toCity.id) return [];
 
   // 1. Exact direct matches from dataset
   const exactMatches = RSRTC_ROUTES.filter(
