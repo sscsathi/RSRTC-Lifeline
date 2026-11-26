@@ -72,27 +72,9 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
         ))}
       </div>
 
-      {/* Passenger Highlights Strip */}
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-[#EAECEF] pt-7">
-        <div>
-          <p className="text-sm font-bold text-slate-900">Stop-by-Stop Timetables</p>
-          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Departure times, intermediate halts, and boarding stand details across Rajasthan corridors.
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-bold text-slate-900">All 50 Connected Depots</p>
-          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Schedules covering Sindhi Camp, Deeg, Bharatpur, Jodhpur, Udaipur, Kota &amp; NCR.
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-bold text-slate-900">24x7 Passenger Control Room</p>
-          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            Toll-free assistance at <span className="font-mono font-semibold text-slate-700">1800-2000-103</span> for route and schedule enquiries.
-          </p>
-        </div>
-      </div>
+      <p className="mt-8 pt-6 border-t border-[#EAECEF] text-xs sm:text-sm text-slate-500 text-center leading-relaxed">
+        Timings and routes are indicative and subject to change; please verify at the bus stand/depot before travel.
+      </p>
     </section>
   );
 };
