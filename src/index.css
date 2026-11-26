@@ -74,11 +74,21 @@
   }
 }
 
+@keyframes rsrtc-bus-glow-in {
+  0% {
+    filter: drop-shadow(0 0 0px rgba(255, 224, 178, 0));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px rgba(255, 224, 178, 0.55));
+  }
+}
+
 .rsrtc-bus-drive-in {
   transform-origin: 55% 78%;
   animation:
     rsrtc-bus-drive-in 750ms both,
-    rsrtc-bus-fade-in 220ms ease-out both;
+    rsrtc-bus-fade-in 220ms ease-out both,
+    rsrtc-bus-glow-in 320ms ease-out 680ms both;
 }
 
 @media (prefers-reduced-motion: reduce) {
