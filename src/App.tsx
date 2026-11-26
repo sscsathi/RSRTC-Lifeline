@@ -21,9 +21,9 @@ import {
   generateBusSchedules,
   findCityById,
   getCityById,
+  getLocalTodayIso,
 } from './data/rsrtcData';
 
-const DEFAULT_TODAY_ISO = '2026-11-26';
 const STORAGE_KEY_RECENT = 'rsrtc_lifeline_recent_v3';
 
 function isValidRecentSearch(item: unknown): item is RecentSearch {
@@ -44,11 +44,29 @@ function isValidRecentSearch(item: unknown): item is RecentSearch {
 }
 
 export default function App() {
+  const [todayIso, setTodayIso] = useState<string>(() => getLocalTodayIso());
   const [fromId, setFromId] = useState<string>('');
   const [toId, setToId] = useState<string>('');
-  const [dateIso, setDateIso] = useState<string>(DEFAULT_TODAY_ISO);
+  const [dateIso, setDateIso] = useState<string>(() => getLocalTodayIso());
   const [busFilter, setBusFilter] = useState<BusFilterOption>('All');
   const [activeView, setActiveView] = useState<'home' | 'results'>('home');
+
+  // Keep todayIso in sync if the tab stays open across local midnight
+  useEffect(() => {
+    const syncToday = () => {
+      const current = getLocalTodayIso();
+      setTodayIso((prev) => (prev === current ? prev : current));
+      setDateIso((prev) => (prev < current ? current : prev));
+    };
+    const intervalId = window.setInterval(syncToday, 60_000);
+    window.addEventListener('focus', syncToday);
+    document.addEventListener('visibilitychange', syncToday);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', syncToday);
+      document.removeEventListener('visibilitychange', syncToday);
+    };
+  }, []);
 
   // Navigation & overlays
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -123,6 +141,14 @@ export default function App() {
     });
   };
 
+  const handleChangeDate = (nextIso: string) => {
+    const currentToday = getLocalTodayIso();
+    if (currentToday !== todayIso) {
+      setTodayIso(currentToday);
+    }
+    setDateIso(nextIso < currentToday ? currentToday : nextIso);
+  };
+
   const executeSearch = (
     nextFrom = fromId,
     nextTo = toId,
@@ -134,11 +160,16 @@ export default function App() {
     if (!validFrom || !validTo || validFrom.id === validTo.id) {
       return;
     }
+    const currentToday = getLocalTodayIso();
+    if (currentToday !== todayIso) {
+      setTodayIso(currentToday);
+    }
+    const safeDate = nextDate < currentToday ? currentToday : nextDate;
     setFromId(validFrom.id);
     setToId(validTo.id);
-    setDateIso(nextDate);
+    setDateIso(safeDate);
     setBusFilter(nextFilter);
-    recordSearch(validFrom.id, validTo.id, nextDate, nextFilter);
+    recordSearch(validFrom.id, validTo.id, safeDate, nextFilter);
     setActiveView('results');
     setRecentSheetOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -154,7 +185,8 @@ export default function App() {
   };
 
   const handleSelectRecentSearch = (item: RecentSearch) => {
-    executeSearch(item.fromId, item.toId, item.dateIso, item.busFilter);
+    const safeDate = item.dateIso < todayIso ? todayIso : item.dateIso;
+    executeSearch(item.fromId, item.toId, safeDate, item.busFilter);
   };
 
   const handleGoHome = () => {
@@ -189,12 +221,12 @@ export default function App() {
               fromId={fromId}
               toId={toId}
               dateIso={dateIso}
-              todayIso={DEFAULT_TODAY_ISO}
+              todayIso={todayIso}
               busFilter={busFilter}
               onChangeFrom={setFromId}
               onChangeTo={setToId}
               onSwapCities={handleSwapCities}
-              onChangeDate={setDateIso}
+              onChangeDate={handleChangeDate}
               onChangeBusFilter={setBusFilter}
               onSearch={() => executeSearch()}
             />
@@ -212,12 +244,12 @@ export default function App() {
             fromId={fromId}
             toId={toId}
             dateIso={dateIso}
-            todayIso={DEFAULT_TODAY_ISO}
+            todayIso={todayIso}
             busFilter={busFilter}
             buses={busSchedules}
             onBack={handleGoHome}
             onSwap={handleSwapCities}
-            onChangeDate={setDateIso}
+            onChangeDate={handleChangeDate}
             onChangeBusFilter={setBusFilter}
             onOpenTimetable={(bus) => setSelectedBus(bus)}
           />

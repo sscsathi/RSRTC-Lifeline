@@ -890,6 +890,13 @@ export function generateBusSchedules(
     .sort((a, b) => a.departureMins - b.departureMins);
 }
 
+export function getLocalTodayIso(now: Date = new Date()): string {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function formatIsoDateParts(iso: string): {
   dayNum: string;
   dayShort: string;
@@ -898,24 +905,33 @@ export function formatIsoDateParts(iso: string): {
   fullLabel: string;
 } {
   const [y, m, d] = iso.split('-').map(Number);
-  const dateObj = new Date(y, (m || 1) - 1, d || 1);
+  const now = new Date();
+  const dateObj = new Date(
+    Number.isFinite(y) ? y : now.getFullYear(),
+    Number.isFinite(m) ? m - 1 : now.getMonth(),
+    Number.isFinite(d) ? d : now.getDate()
+  );
+  const dayNum = String(dateObj.getDate()).padStart(2, '0');
+  const year = String(dateObj.getFullYear());
   const dayShort = dateObj.toLocaleDateString('en-IN', { weekday: 'short' });
   const monthShort = dateObj.toLocaleDateString('en-IN', { month: 'short' });
   return {
-    dayNum: String(d).padStart(2, '0'),
+    dayNum,
     dayShort,
     monthShort,
-    year: String(y),
-    fullLabel: `${dayShort}, ${String(d).padStart(2, '0')} ${monthShort} ${y}`,
+    year,
+    fullLabel: `${dayShort}, ${dayNum} ${monthShort} ${year}`,
   };
 }
 
 export function shiftIsoDate(iso: string, deltaDays: number): string {
   const [y, m, d] = iso.split('-').map(Number);
-  const dateObj = new Date(y, (m || 1) - 1, d || 1);
+  const now = new Date();
+  const dateObj = new Date(
+    Number.isFinite(y) ? y : now.getFullYear(),
+    Number.isFinite(m) ? m - 1 : now.getMonth(),
+    Number.isFinite(d) ? d : now.getDate()
+  );
   dateObj.setDate(dateObj.getDate() + deltaDays);
-  const ny = dateObj.getFullYear();
-  const nm = String(dateObj.getMonth() + 1).padStart(2, '0');
-  const nd = String(dateObj.getDate()).padStart(2, '0');
-  return `${ny}-${nm}-${nd}`;
+  return getLocalTodayIso(dateObj);
 }

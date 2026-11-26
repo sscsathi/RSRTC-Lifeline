@@ -66,7 +66,11 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
   } | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const [y, m] = dateIso.split('-').map(Number);
-    return { year: y, month: (m || 11) - 1 };
+    const now = new Date();
+    return {
+      year: Number.isFinite(y) ? y : now.getFullYear(),
+      month: Number.isFinite(m) ? m - 1 : now.getMonth(),
+    };
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,7 +78,16 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
   const fromCity = findCityById(fromId);
   const toCity = findCityById(toId);
   const dateParts = formatIsoDateParts(dateIso);
+  const todayParts = formatIsoDateParts(todayIso);
   const tomorrowIso = shiftIsoDate(todayIso, 1);
+  const tomorrowParts = formatIsoDateParts(tomorrowIso);
+
+  useEffect(() => {
+    const [y, m] = dateIso.split('-').map(Number);
+    if (Number.isFinite(y) && Number.isFinite(m)) {
+      setCalendarMonth({ year: y, month: m - 1 });
+    }
+  }, [dateIso]);
 
   useEffect(() => {
     setValidationError(null);
@@ -179,9 +192,24 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
     year: 'numeric',
   });
 
+  const [todayYear, todayMonthNum] = todayIso.split('-').map(Number);
+  const isAtMinMonth =
+    calendarMonth.year < todayYear ||
+    (calendarMonth.year === todayYear && calendarMonth.month <= todayMonthNum - 1);
+
   const shiftCalendarMonth = (delta: number) => {
+    if (delta < 0 && isAtMinMonth) return;
     const next = new Date(calendarMonth.year, calendarMonth.month + delta, 1);
-    setCalendarMonth({ year: next.getFullYear(), month: next.getMonth() });
+    const nextYear = next.getFullYear();
+    const nextMonth = next.getMonth();
+    if (
+      nextYear < todayYear ||
+      (nextYear === todayYear && nextMonth < todayMonthNum - 1)
+    ) {
+      setCalendarMonth({ year: todayYear, month: todayMonthNum - 1 });
+      return;
+    }
+    setCalendarMonth({ year: nextYear, month: nextMonth });
   };
 
   return (
@@ -488,8 +516,7 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                       : 'bg-white text-slate-700 border border-[#EAECEF] hover:border-[#D81B60]/40 hover:text-[#D81B60]'
                   }`}
                 >
-                  Today · {formatIsoDateParts(todayIso).dayNum}{' '}
-                  {formatIsoDateParts(todayIso).monthShort}
+                  Today · {todayParts.dayNum} {todayParts.monthShort}
                 </button>
                 <button
                   type="button"
@@ -503,8 +530,7 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                       : 'bg-white text-slate-700 border border-[#EAECEF] hover:border-[#D81B60]/40 hover:text-[#D81B60]'
                   }`}
                 >
-                  Tomorrow · {formatIsoDateParts(tomorrowIso).dayNum}{' '}
-                  {formatIsoDateParts(tomorrowIso).monthShort}
+                  Tomorrow · {tomorrowParts.dayNum} {tomorrowParts.monthShort}
                 </button>
               </div>
 
@@ -514,9 +540,14 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                   <div className="flex items-center justify-between mb-3">
                     <button
                       type="button"
+                      disabled={isAtMinMonth}
                       onClick={() => shiftCalendarMonth(-1)}
                       aria-label="Previous month"
-                      className="w-9 h-9 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-700 cursor-pointer"
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
+                        isAtMinMonth
+                          ? 'text-slate-300 cursor-not-allowed'
+                          : 'hover:bg-slate-100 text-slate-700 cursor-pointer'
+                      }`}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -555,7 +586,9 @@ export const SearchWidget: React.FC<SearchWidgetProps> = ({
                           key={iso}
                           type="button"
                           disabled={isPast}
+                          aria-disabled={isPast}
                           onClick={() => {
+                            if (isPast) return;
                             onChangeDate(iso);
                             setOpenDropdown(null);
                           }}
