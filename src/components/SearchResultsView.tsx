@@ -310,7 +310,7 @@ export const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                         <span className="w-2 h-2 rounded-full bg-slate-700 shrink-0" />
                       </div>
                       <span className="text-[11px] text-slate-400 tabular-nums">
-                        {bus.stops.length - 2} intermediate stops
+                        {bus.fromCity.code} → {bus.toCity.code}
                       </span>
                     </div>
 
@@ -344,15 +344,14 @@ export const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                   </div>
                 </div>
 
-                {/* Bottom Row: Service Features & Via Stops (Left) + View Timetable CTA (Right) */}
+                {/* Bottom Row: Service Features (Left) + View Timetable CTA (Right) */}
                 <div className="mt-4 pt-4 border-t border-[#EAECEF] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="min-w-0 space-y-0.5 text-xs">
+                  <div className="min-w-0 text-xs">
                     <p className="font-semibold text-slate-700 truncate">
-                      {bus.amenities.slice(0, 2).join(' • ')}
-                      {bus.isConnecting ? ' • Connecting Hub Route' : ''}
-                    </p>
-                    <p className="text-slate-500 truncate">
-                      Via: {bus.viaText}
+                      {bus.amenities
+                        .filter((item) => !/fare|₹|^via\b/i.test(item))
+                        .slice(0, 2)
+                        .join(' • ')}
                     </p>
                   </div>
 

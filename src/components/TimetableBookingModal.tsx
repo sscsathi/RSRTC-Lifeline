@@ -25,6 +25,13 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
   if (!bus) return null;
 
   const dateParts = formatIsoDateParts(dateIso);
+  const endpointStops =
+    bus.stops.length >= 2
+      ? [bus.stops[0], bus.stops[bus.stops.length - 1]]
+      : bus.stops;
+  const displayAmenities = bus.amenities
+    .filter((item) => !/fare|₹|^via\b/i.test(item))
+    .slice(0, 2);
 
   return (
     <div
@@ -69,16 +76,16 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
               Operated by <strong className="text-slate-800">{bus.depotName}</strong>
             </span>
             <span className="tabular-nums">
-              {bus.stops.length} Stops ·{' '}
+              Origin &amp; Destination ·{' '}
               <strong className="text-slate-800">{bus.distanceKm} km</strong> ·{' '}
               {bus.durationLabel}
             </span>
           </div>
 
           <ol className="relative space-y-0">
-            {bus.stops.map((stop, idx) => {
+            {endpointStops.map((stop, idx) => {
               const isFirst = idx === 0;
-              const isLast = idx === bus.stops.length - 1;
+              const isLast = idx === endpointStops.length - 1;
               return (
                 <li key={`${stop.stopName}-${idx}`} className="flex gap-4 pb-5 last:pb-0">
                   {/* Time column */}
@@ -93,13 +100,7 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
 
                   {/* Vertical Timeline Dot & Line */}
                   <div className="relative flex flex-col items-center">
-                    <span
-                      className={`w-3.5 h-3.5 rounded-full border-2 z-10 mt-1 ${
-                        isFirst || isLast
-                          ? 'bg-[#D81B60] border-[#D81B60]'
-                          : 'bg-white border-[#D81B60]'
-                      }`}
-                    />
+                    <span className="w-3.5 h-3.5 rounded-full border-2 z-10 mt-1 bg-[#D81B60] border-[#D81B60]" />
                     {!isLast && <span className="w-0.5 flex-1 bg-slate-200 my-1" />}
                   </div>
 
@@ -119,12 +120,8 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
                         <span>
                           Boarding opens {stop.arrivalTime} · Departs {stop.departureTime}
                         </span>
-                      ) : isLast ? (
-                        <span>Scheduled Arrival {stop.arrivalTime}</span>
                       ) : (
-                        <span>
-                          Arr {stop.arrivalTime} · Dep {stop.departureTime} ({stop.haltMins}m halt)
-                        </span>
+                        <span>Scheduled Arrival {stop.arrivalTime}</span>
                       )}
                     </div>
                   </div>
@@ -135,7 +132,7 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
 
           <div className="mt-6 pt-4 border-t border-[#EAECEF] flex items-center justify-between gap-3">
             <span className="text-xs font-medium text-slate-500">
-              {bus.amenities.slice(0, 2).join(' • ')}
+              {displayAmenities.join(' • ')}
             </span>
             <button
               type="button"

@@ -1177,21 +1177,14 @@ function normalizeCategory(type: string): {
   };
 }
 
-function buildStopsFromVia(
+function buildEndpointStops(
   fromCity: CityHub,
   toCity: CityHub,
-  viaText: string,
   depMins: number,
   durationMinutes: number,
   distanceKm: number,
-  platformIndex: number,
-  category: BusCategory
+  platformIndex: number
 ): RouteStop[] {
-  const waypoints = viaText
-    .split(/\s*-\s*/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-
   return [
     {
       stopName: fromCity.name,
@@ -1202,28 +1195,6 @@ function buildStopsFromVia(
       distanceKm: 0,
       platform: `Platform ${(platformIndex % 6) + 1}`,
     },
-    ...waypoints.map((wp, wpIdx) => {
-      const ratio = (wpIdx + 1) / (waypoints.length + 1);
-      const stopArr = depMins + Math.round(durationMinutes * ratio);
-      const halt =
-        category === 'Super Deluxe' || category === 'Super Luxury Volvo'
-          ? 5
-          : category === 'AC Sleeper'
-          ? 10
-          : 7;
-      return {
-        stopName: wp,
-        stand: wp.includes('Sindhi Camp')
-          ? 'Sindhi Camp Transit Terminal'
-          : wp.includes('Bus Stand')
-          ? wp
-          : `${wp} Bus Stand`,
-        arrivalTime: formatMinsTo12h(stopArr),
-        departureTime: formatMinsTo12h(stopArr + halt),
-        haltMins: halt,
-        distanceKm: Math.round(distanceKm * ratio),
-      };
-    }),
     {
       stopName: toCity.name,
       stand: toCity.stand,
@@ -1294,16 +1265,14 @@ function createBusFromRaw(
     indicativeFare,
     boardingPoint: `${fromCity.stand} · Platform ${(seed % 6) + 1}`,
     droppingPoint: toCity.stand,
-    amenities: [amenities[1] ?? amenities[0], `Est. Fare ~₹${indicativeFare}`, 'Daily Service'],
-    stops: buildStopsFromVia(
+    amenities: [amenities[1] ?? amenities[0], 'Daily Service'],
+    stops: buildEndpointStops(
       fromCity,
       toCity,
-      viaText,
       depMins,
       durationMinutes,
       distanceKm,
-      seed,
-      category
+      seed
     ),
     onTimePercent: 92 + (seed % 7),
   };
@@ -1378,59 +1347,7 @@ function expandCorridorSchedules(
   });
 }
 
-function chooseMajorTransitHubs(fromCity: CityHub, toCity: CityHub): string[] {
-  const excluded = new Set([fromCity.name, toCity.name]);
-  const candidates: string[] = [];
 
-  // Regionally logical Rajasthan transit corridors
-  const regions = new Set([fromCity.region, toCity.region]);
-
-  if (regions.has('East') && !excluded.has('Jaipur (Sindhi Camp)')) {
-    candidates.push('Jaipur (Sindhi Camp)');
-  }
-  if (
-    (regions.has('West') && (regions.has('Central') || regions.has('South'))) ||
-    (regions.has('West') && regions.has('West'))
-  ) {
-    if (!excluded.has('Jodhpur')) candidates.push('Jodhpur');
-    if (!excluded.has('Pali')) candidates.push('Pali');
-  }
-  if (
-    (regions.has('Central') || regions.has('South') || regions.has('West')) &&
-    !excluded.has('Ajmer')
-  ) {
-    candidates.push('Ajmer');
-  }
-  if (regions.has('North') && !excluded.has('Bikaner')) {
-    candidates.push('Bikaner');
-  }
-  if (regions.has('North') && !excluded.has('Sikar')) {
-    candidates.push('Sikar');
-  }
-  if (regions.has('Southeast') && !excluded.has('Kota')) {
-    candidates.push('Kota');
-  }
-  if (regions.has('South') && !excluded.has('Udaipur')) {
-    candidates.push('Udaipur');
-  }
-  if (regions.has('East') && !excluded.has('Dausa')) {
-    candidates.push('Dausa');
-  }
-  if (regions.has('Interstate') && !excluded.has('Jaipur (Sindhi Camp)')) {
-    candidates.push('Jaipur (Sindhi Camp)');
-  }
-
-  // Always guarantee major hubs fallback
-  for (const fallback of ['Jaipur (Sindhi Camp)', 'Ajmer', 'Jodhpur']) {
-    if (!excluded.has(fallback) && !candidates.includes(fallback)) {
-      candidates.push(fallback);
-    }
-  }
-
-  // Deduplicate and take 1-2 logical transit hubs
-  const unique = Array.from(new Set(candidates));
-  return unique.slice(0, 2);
-}
 
 /**
  * Generates deterministic RSRTC schedules for ANY pair of Rajasthan districts & interstate hubs:
@@ -1553,18 +1470,14 @@ export function generateBusSchedules(
     return returnBuses.sort((a, b) => a.departureMins - b.departureMins);
   }
 
-  // 3. Smart Fallback / Connecting Bus Generator for any other pair of the 50 Rajasthan districts
+  // 3. Smart Fallback Schedule Generator for any other pair of the 50 Rajasthan districts
   const distanceKm = calculateRoadDistanceKm(fromCity, toCity);
-  const transitHubs = chooseMajorTransitHubs(fromCity, toCity);
-  const primaryVia = transitHubs.join(' - ');
-  const altVia = transitHubs[0] ?? 'Jaipur (Sindhi Camp)';
   const seed = deterministicHash(`${fromCity.id}-${toCity.id}-${dateIso}`);
 
   const fallbackTemplates: {
     depMins: number;
     type: BusCategory;
     speedKmh: number;
-    via: string;
     depot: string;
     codeTag: string;
   }[] = [
@@ -1572,7 +1485,6 @@ export function generateBusSchedules(
       depMins: 6 * 60 + 30 + (seed % 3) * 15,
       type: 'Express',
       speedKmh: 48,
-      via: primaryVia,
       depot: fromCity.depot,
       codeTag: 'M1',
     },
@@ -1580,7 +1492,6 @@ export function generateBusSchedules(
       depMins: 11 * 60 + 15 + (seed % 4) * 15,
       type: 'Ordinary',
       speedKmh: 43,
-      via: primaryVia,
       depot: toCity.depot,
       codeTag: 'A1',
     },
@@ -1588,16 +1499,14 @@ export function generateBusSchedules(
       depMins: 15 * 60 + 30 + (seed % 3) * 15,
       type: 'Super Deluxe',
       speedKmh: 54,
-      via: altVia,
-      depot: `${altVia.replace(/\s*\(.*?\)\s*/g, '')} Depot`,
+      depot: fromCity.depot,
       codeTag: 'E1',
     },
     {
       depMins: 21 * 60 + (seed % 3) * 15,
       type: distanceKm >= 220 ? 'AC Sleeper' : 'Super Luxury Volvo',
       speedKmh: 56,
-      via: altVia,
-      depot: fromCity.depot,
+      depot: toCity.depot,
       codeTag: 'N1',
     },
   ];
@@ -1628,9 +1537,9 @@ export function generateBusSchedules(
         filterKey,
         fromCity,
         toCity,
-        viaText: tpl.via,
+        viaText: '',
         isDirectDataset: false,
-        isConnecting: true,
+        isConnecting: false,
         departureTime: formatMinsTo12h(tpl.depMins),
         arrivalTime: formatMinsTo12h(arrMins),
         departureMins: tpl.depMins,
@@ -1640,16 +1549,14 @@ export function generateBusSchedules(
         indicativeFare,
         boardingPoint: `${fromCity.stand} · Platform ${(busSeed % 5) + 1}`,
         droppingPoint: toCity.stand,
-        amenities: [amenities[1] ?? amenities[0], `Est. Fare ~₹${indicativeFare}`, `Via ${altVia}`],
-        stops: buildStopsFromVia(
+        amenities: [amenities[1] ?? amenities[0], 'Daily Service'],
+        stops: buildEndpointStops(
           fromCity,
           toCity,
-          tpl.via,
           tpl.depMins,
           durationMinutes,
           distanceKm,
-          busSeed,
-          category
+          busSeed
         ),
         onTimePercent: 90 + (busSeed % 8),
       };
