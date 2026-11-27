@@ -154,7 +154,7 @@ export const STATION_NAMES: string[] = [
   'Churu',
   'Dausa',
   'Deeg',
-  'Delhi (ISBT Kashmere Gate)',
+  'Delhi',
   'Dholpur',
   'Didwana-Kuchaman',
   'Dudu',
@@ -239,7 +239,7 @@ const STATION_META: Record<
   Churu: { code: 'CHR', stand: 'Churu Central Bus Stand', depot: 'Churu Depot', region: 'North', lat: 28.292, lng: 74.964 },
   Dausa: { code: 'DSA', stand: 'Dausa Roadways Bus Stand', depot: 'Dausa Depot', region: 'East', lat: 26.892, lng: 76.336 },
   Deeg: { code: 'DEG', stand: 'Deeg Central Bus Stand', depot: 'Deeg Depot', region: 'East', lat: 27.472, lng: 77.326 },
-  'Delhi (ISBT Kashmere Gate)': { code: 'DEL', stand: 'ISBT Kashmere Gate / Dhaula Kuan', depot: 'RSRTC Delhi Depot (ISBT)', region: 'Interstate', state: 'Delhi NCR', lat: 28.667, lng: 77.228 },
+  Delhi: { code: 'DEL', stand: 'Delhi Central Bus Stand', depot: 'RSRTC Delhi Depot (ISBT)', region: 'Interstate', state: 'Delhi NCR', lat: 28.667, lng: 77.228 },
   Dholpur: { code: 'DLP', stand: 'Dholpur Central Bus Stand', depot: 'Dholpur Depot', region: 'East', lat: 26.702, lng: 77.893 },
   'Didwana-Kuchaman': { code: 'DDW', stand: 'Didwana-Kuchaman Bus Stand', depot: 'Didwana Depot', region: 'Central', lat: 27.397, lng: 74.573 },
   Dudu: { code: 'DDU', stand: 'Dudu Highway Bus Stand', depot: 'Ajmer Depot', region: 'Central', lat: 26.682, lng: 75.235 },
@@ -386,7 +386,7 @@ export const EXTENDED_CORRIDORS: CorridorSchedule[] = [
   {
     id: 'CORR-KRL-DEL',
     from: 'Karauli',
-    to: 'Delhi (ISBT Kashmere Gate)',
+    to: 'Delhi',
     via: 'Hindaun - Bharatpur - Mathura - Palwal',
     duration: '6h 30m',
     depotFrom: 'Karauli Depot',
@@ -513,7 +513,7 @@ export const EXTENDED_CORRIDORS: CorridorSchedule[] = [
   {
     id: 'CORR-JJN-DEL',
     from: 'Jhunjhunu',
-    to: 'Delhi (ISBT Kashmere Gate)',
+    to: 'Delhi',
     via: 'Chirawa - Singhana - Narnaul - Gurugram - Dhaula Kuan',
     duration: '5h 30m',
     depotFrom: 'Jhunjhunu Depot',
@@ -524,7 +524,7 @@ export const EXTENDED_CORRIDORS: CorridorSchedule[] = [
   {
     id: 'CORR-PLN-DEL',
     from: 'Pilani',
-    to: 'Delhi (ISBT Kashmere Gate)',
+    to: 'Delhi',
     via: 'Loharu - Bhiwani / Rewari',
     duration: '4h 45m',
     depotFrom: 'Jhunjhunu / Pilani Depot',
@@ -872,7 +872,7 @@ export const EXTENDED_CORRIDORS: CorridorSchedule[] = [
   {
     id: 'CORR-HMG-DEL',
     from: 'Hanumangarh',
-    to: 'Delhi (ISBT Kashmere Gate)',
+    to: 'Delhi',
     via: 'Sirsa - Fatehabad - Hisar - Rohtak',
     duration: '7h 00m',
     depotFrom: 'Hanumangarh Depot',
@@ -1037,6 +1037,17 @@ export const DEEG_TO_ALWAR_ROUTES: RawDatasetRoute[] = [
   { id: 'RSRTC-DEG-ALW-34', from: 'Deeg', to: 'Alwar', via: '', departure: '07:30 PM', arrival: '09:30 PM', duration: '2h 00m', type: 'Express', depot: 'Alwar Depot' },
 ];
 
+export const DEEG_TO_DELHI_ROUTES: RawDatasetRoute[] = [
+  { id: 'RSRTC-DEG-DEL-01', from: 'Deeg', to: 'Delhi', via: 'Kosi - Palwal - Faridabad', departure: '05:00 AM', arrival: '08:15 AM', duration: '3h 15m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-02', from: 'Deeg', to: 'Delhi', via: 'Kaman - Gurugram', departure: '06:00 AM', arrival: '10:45 AM', duration: '4h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-03', from: 'Deeg', to: 'Delhi', via: 'Deeg - Kosi', departure: '06:15 AM', arrival: '10:00 AM', duration: '3h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-04', from: 'Deeg', to: 'Delhi', via: 'Kaman - Ballabhgarh', departure: '07:15 AM', arrival: '11:00 AM', duration: '3h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-05', from: 'Deeg', to: 'Delhi', via: 'Kaman - Delhi', departure: '08:30 AM', arrival: '12:15 PM', duration: '3h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-06', from: 'Deeg', to: 'Delhi', via: 'Kaman - Ballabhgarh', departure: '09:30 AM', arrival: '01:15 PM', duration: '3h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-07', from: 'Deeg', to: 'Delhi', via: 'Kaman - Ballabhgarh', departure: '01:15 PM', arrival: '05:00 PM', duration: '3h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-DEL-08', from: 'Deeg', to: 'Delhi', via: 'Kaman - Ballabhgarh', departure: '03:15 PM', arrival: '07:00 PM', duration: '3h 45m', type: 'Express', depot: 'Lohagarh Depot' },
+];
+
 export const POPULAR_ROUTES: PopularRoute[] = [
   {
     id: 'jpr-btp',
@@ -1140,9 +1151,12 @@ export function findCityById(id: string): CityHub | null {
   if (!id) return null;
   const exact = CITY_HUBS.find((c) => c.id === id);
   if (exact) return exact;
-  // Graceful fallback for older saved IDs like 'jaipur'
+  // Graceful fallback for older saved IDs like 'jaipur' or 'delhi-isbt-kashmere-gate'
   if (id === 'jaipur') {
     return CITY_HUBS.find((c) => c.id === 'jaipur-sindhi-camp') ?? null;
+  }
+  if (id === 'delhi-isbt-kashmere-gate') {
+    return CITY_HUBS.find((c) => c.id === 'delhi') ?? null;
   }
   return null;
 }
@@ -1476,6 +1490,13 @@ export function generateBusSchedules(
   // Strict one-way schedule for Deeg -> Alwar (34 exact buses, no duplicates or fallback additions)
   if (fromCity.id === 'deeg' && toCity.id === 'alwar') {
     return DEEG_TO_ALWAR_ROUTES.map((raw) =>
+      createBusFromRaw(raw, fromCity, toCity, dateIso)
+    ).sort((a, b) => a.departureMins - b.departureMins);
+  }
+
+  // Strict one-way schedule for Deeg -> Delhi (8 exact buses, no duplicates or fallback additions)
+  if (fromCity.id === 'deeg' && toCity.id === 'delhi') {
+    return DEEG_TO_DELHI_ROUTES.map((raw) =>
       createBusFromRaw(raw, fromCity, toCity, dateIso)
     ).sort((a, b) => a.departureMins - b.departureMins);
   }

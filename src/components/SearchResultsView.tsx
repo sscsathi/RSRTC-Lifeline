@@ -349,15 +349,20 @@ export const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                   </div>
                 </div>
 
-                {/* Bottom Row: Service Features (Left) + View Timetable CTA (Right) */}
+                {/* Bottom Row: Service Features & Via (Left) + View Timetable CTA (Right) */}
                 <div className="mt-4 pt-4 border-t border-[#EAECEF] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="min-w-0 text-xs">
+                  <div className="min-w-0 space-y-0.5 text-xs">
                     <p className="font-semibold text-slate-700 truncate">
                       {bus.amenities
                         .filter((item) => !/fare|₹|^via\b/i.test(item))
                         .slice(0, 2)
                         .join(' • ')}
                     </p>
+                    {bus.viaText && (
+                      <p className="text-slate-500 truncate">
+                        Via: {bus.viaText}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex items-center shrink-0">
