@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rsrtc-lifeline.vercel.app/sitemap.xml
