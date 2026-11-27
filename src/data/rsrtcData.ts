@@ -1000,6 +1000,43 @@ export const MATHURA_TO_DEEG_ROUTES: RawDatasetRoute[] = [
   { id: 'RSRTC-MTR-DEG-21', from: 'Mathura', to: 'Deeg', via: '', departure: '06:30 PM', arrival: '07:25 PM', duration: '55m', type: 'Express', depot: 'Alwar Depot' },
 ];
 
+export const DEEG_TO_ALWAR_ROUTES: RawDatasetRoute[] = [
+  { id: 'RSRTC-DEG-ALW-01', from: 'Deeg', to: 'Alwar', via: '', departure: '05:00 AM', arrival: '07:15 AM', duration: '2h 15m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-02', from: 'Deeg', to: 'Alwar', via: '', departure: '05:20 AM', arrival: '07:50 AM', duration: '2h 30m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-03', from: 'Deeg', to: 'Alwar', via: '', departure: '05:30 AM', arrival: '07:30 AM', duration: '2h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-04', from: 'Deeg', to: 'Alwar', via: '', departure: '06:00 AM', arrival: '08:15 AM', duration: '2h 15m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-05', from: 'Deeg', to: 'Alwar', via: '', departure: '06:40 AM', arrival: '09:10 AM', duration: '2h 30m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-06', from: 'Deeg', to: 'Alwar', via: '', departure: '06:45 AM', arrival: '09:00 AM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-07', from: 'Deeg', to: 'Alwar', via: '', departure: '07:00 AM', arrival: '09:30 AM', duration: '2h 30m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-08', from: 'Deeg', to: 'Alwar', via: '', departure: '07:15 AM', arrival: '09:30 AM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-09', from: 'Deeg', to: 'Alwar', via: '', departure: '08:00 AM', arrival: '10:30 AM', duration: '2h 30m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-10', from: 'Deeg', to: 'Alwar', via: '', departure: '08:45 AM', arrival: '12:10 PM', duration: '3h 25m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-11', from: 'Deeg', to: 'Alwar', via: '', departure: '09:15 AM', arrival: '11:30 AM', duration: '2h 15m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-12', from: 'Deeg', to: 'Alwar', via: '', departure: '09:45 AM', arrival: '12:00 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-13', from: 'Deeg', to: 'Alwar', via: '', departure: '10:15 AM', arrival: '12:30 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-14', from: 'Deeg', to: 'Alwar', via: '', departure: '11:00 AM', arrival: '01:15 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-15', from: 'Deeg', to: 'Alwar', via: '', departure: '11:25 AM', arrival: '01:50 PM', duration: '2h 25m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-16', from: 'Deeg', to: 'Alwar', via: '', departure: '11:55 AM', arrival: '02:10 PM', duration: '2h 15m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-17', from: 'Deeg', to: 'Alwar', via: '', departure: '12:15 PM', arrival: '02:30 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-18', from: 'Deeg', to: 'Alwar', via: '', departure: '01:05 PM', arrival: '03:30 PM', duration: '2h 25m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-19', from: 'Deeg', to: 'Alwar', via: '', departure: '01:25 PM', arrival: '03:40 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-20', from: 'Deeg', to: 'Alwar', via: '', departure: '01:45 PM', arrival: '04:10 PM', duration: '2h 25m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-21', from: 'Deeg', to: 'Alwar', via: '', departure: '02:05 PM', arrival: '04:20 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-22', from: 'Deeg', to: 'Alwar', via: '', departure: '02:15 PM', arrival: '04:30 PM', duration: '2h 15m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-23', from: 'Deeg', to: 'Alwar', via: '', departure: '02:45 PM', arrival: '05:00 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-24', from: 'Deeg', to: 'Alwar', via: '', departure: '04:00 PM', arrival: '06:30 PM', duration: '2h 30m', type: 'Ordinary', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-ALW-25', from: 'Deeg', to: 'Alwar', via: '', departure: '04:05 PM', arrival: '06:20 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-26', from: 'Deeg', to: 'Alwar', via: '', departure: '04:15 PM', arrival: '06:45 PM', duration: '2h 30m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-27', from: 'Deeg', to: 'Alwar', via: '', departure: '04:25 PM', arrival: '06:40 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-28', from: 'Deeg', to: 'Alwar', via: '', departure: '04:45 PM', arrival: '07:00 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-29', from: 'Deeg', to: 'Alwar', via: '', departure: '05:00 PM', arrival: '07:30 PM', duration: '2h 30m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-30', from: 'Deeg', to: 'Alwar', via: '', departure: '05:16 PM', arrival: '07:30 PM', duration: '2h 14m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-31', from: 'Deeg', to: 'Alwar', via: '', departure: '05:20 PM', arrival: '07:50 PM', duration: '2h 30m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-32', from: 'Deeg', to: 'Alwar', via: '', departure: '06:00 PM', arrival: '08:00 PM', duration: '2h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-33', from: 'Deeg', to: 'Alwar', via: '', departure: '06:30 PM', arrival: '08:45 PM', duration: '2h 15m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-ALW-34', from: 'Deeg', to: 'Alwar', via: '', departure: '07:30 PM', arrival: '09:30 PM', duration: '2h 00m', type: 'Express', depot: 'Alwar Depot' },
+];
+
 export const POPULAR_ROUTES: PopularRoute[] = [
   {
     id: 'jpr-btp',
@@ -1432,6 +1469,13 @@ export function generateBusSchedules(
   // Strict one-way schedule for Mathura -> Deeg (21 exact buses, no duplicates or fallback additions)
   if (fromCity.id === 'mathura' && toCity.id === 'deeg') {
     return MATHURA_TO_DEEG_ROUTES.map((raw) =>
+      createBusFromRaw(raw, fromCity, toCity, dateIso)
+    ).sort((a, b) => a.departureMins - b.departureMins);
+  }
+
+  // Strict one-way schedule for Deeg -> Alwar (34 exact buses, no duplicates or fallback additions)
+  if (fromCity.id === 'deeg' && toCity.id === 'alwar') {
+    return DEEG_TO_ALWAR_ROUTES.map((raw) =>
       createBusFromRaw(raw, fromCity, toCity, dateIso)
     ).sort((a, b) => a.departureMins - b.departureMins);
   }
