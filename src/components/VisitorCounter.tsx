@@ -1,24 +1,80 @@
 import React, { useEffect, useState } from 'react';
 import { Eye } from 'lucide-react';
 
-const COUNTER_BASE_URL = 'https://countapi.mileshilliard.com/api/v1';
-const COUNTER_KEY = 'rsrtc-lifeline-rajasthan-visits';
+const PREVIOUS_VISITS = 64;
+const ABACUS_BASE = 'https://abacus.jasoncameron.dev';
+const ABACUS_NAMESPACE = 'rsrtc-lifeline.vercel.app';
+const ABACUS_KEY = 'visits';
+const COUNTERAPI_BASE = 'https://api.counterapi.dev/v1/rsrtc-lifeline-rajasthan/visits';
 const SESSION_COUNTED_KEY = 'rsrtc_visit_counted';
-const SESSION_CACHE_KEY = 'rsrtc_visit_count_cache';
+const LOCAL_LAST_COUNT_KEY = 'rsrtc_last_visits_count';
+const FETCH_TIMEOUT_MS = 4000;
 
-let inFlightFetch: Promise<number | null> | null = null;
+let inFlightFetch: Promise<number> | null = null;
 
-function parseCounterValue(data: unknown): number | null {
-  if (!data || typeof data !== 'object') return null;
-  const record = data as Record<string, unknown>;
-  const raw = record.value ?? record.count;
+function parseNumericCount(raw: unknown): number | null {
   const parsed = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN;
   return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : null;
 }
 
-async function fetchVisitCount(): Promise<number | null> {
-  if (typeof window === 'undefined' || typeof navigator !== 'undefined' && !navigator.onLine) {
+function parseCounterResponse(data: unknown): number | null {
+  if (!data || typeof data !== 'object') return null;
+  const record = data as Record<string, unknown>;
+  return parseNumericCount(record.value ?? record.count);
+}
+
+function readCachedCount(): number | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(LOCAL_LAST_COUNT_KEY);
+    if (raw === null) return null;
+    return parseNumericCount(raw);
+  } catch {
     return null;
+  }
+}
+
+function getInitialVisitCount(): number {
+  return Math.max(readCachedCount() ?? 0, PREVIOUS_VISITS);
+}
+
+function writeCachedCount(count: number): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(LOCAL_LAST_COUNT_KEY, String(count));
+  } catch {
+    // Ignore storage quota or privacy-mode errors
+  }
+}
+
+async function fetchCountWithTimeout(
+  url: string,
+  timeoutMs: number = FETCH_TIMEOUT_MS
+): Promise<number | null> {
+  const controller = new AbortController();
+  const timerId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    if (!response.ok) return null;
+    const data: unknown = await response.json();
+    return parseCounterResponse(data);
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(timerId);
+  }
+}
+
+async function fetchVisitCount(): Promise<number> {
+  const cached = getInitialVisitCount();
+
+  if (typeof window === 'undefined') return cached;
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return cached;
   }
 
   let alreadyCounted = false;
@@ -28,40 +84,52 @@ async function fetchVisitCount(): Promise<number | null> {
     alreadyCounted = false;
   }
 
-  const endpoint = alreadyCounted
-    ? `${COUNTER_BASE_URL}/get/${COUNTER_KEY}`
-    : `${COUNTER_BASE_URL}/hit/${COUNTER_KEY}`;
+  let totalVal: number | null = null;
 
-  try {
-    let response = await fetch(endpoint, { method: 'GET', cache: 'no-store' });
-
-    if (alreadyCounted && response.status === 404) {
-      response = await fetch(`${COUNTER_BASE_URL}/hit/${COUNTER_KEY}`, {
-        method: 'GET',
-        cache: 'no-store',
-      });
+  if (!alreadyCounted) {
+    const liveVal = await fetchCountWithTimeout(
+      `${ABACUS_BASE}/hit/${ABACUS_NAMESPACE}/${ABACUS_KEY}`
+    );
+    if (liveVal !== null) {
+      totalVal = PREVIOUS_VISITS + liveVal;
+    } else {
+      const fallbackVal = await fetchCountWithTimeout(`${COUNTERAPI_BASE}/up`);
+      if (fallbackVal !== null) {
+        totalVal = Math.max(fallbackVal, PREVIOUS_VISITS);
+      }
     }
 
-    if (!response.ok) return null;
-
-    const data: unknown = await response.json();
-    const count = parseCounterValue(data);
-    if (count === null) return null;
-
-    try {
-      window.sessionStorage.setItem(SESSION_COUNTED_KEY, '1');
-      window.sessionStorage.setItem(SESSION_CACHE_KEY, String(count));
-    } catch {
-      // Ignore storage quota or privacy-mode errors
+    if (totalVal !== null) {
+      try {
+        window.sessionStorage.setItem(SESSION_COUNTED_KEY, '1');
+      } catch {
+        // Ignore storage access errors
+      }
     }
-
-    return count;
-  } catch {
-    return null;
+  } else {
+    const liveVal = await fetchCountWithTimeout(
+      `${ABACUS_BASE}/get/${ABACUS_NAMESPACE}/${ABACUS_KEY}`
+    );
+    if (liveVal !== null) {
+      totalVal = PREVIOUS_VISITS + liveVal;
+    } else {
+      const fallbackVal = await fetchCountWithTimeout(`${COUNTERAPI_BASE}/`);
+      if (fallbackVal !== null) {
+        totalVal = Math.max(fallbackVal, PREVIOUS_VISITS);
+      }
+    }
   }
+
+  if (totalVal !== null) {
+    const finalCount = Math.max(totalVal, cached);
+    writeCachedCount(finalCount);
+    return finalCount;
+  }
+
+  return cached;
 }
 
-function getVisitCountOnce(): Promise<number | null> {
+function getVisitCountOnce(): Promise<number> {
   if (!inFlightFetch) {
     inFlightFetch = fetchVisitCount().finally(() => {
       inFlightFetch = null;
@@ -71,32 +139,19 @@ function getVisitCountOnce(): Promise<number | null> {
 }
 
 export const VisitorCounter: React.FC = () => {
-  const [visitCount, setVisitCount] = useState<number | null>(() => {
-    try {
-      const cached = window.sessionStorage.getItem(SESSION_CACHE_KEY);
-      if (cached !== null) {
-        const num = Number(cached);
-        if (Number.isFinite(num) && num >= 0) return Math.floor(num);
-      }
-    } catch {
-      // Ignore storage access errors
-    }
-    return null;
-  });
+  const [visitCount, setVisitCount] = useState<number>(() => getInitialVisitCount());
 
   useEffect(() => {
     let active = true;
     getVisitCountOnce().then((count) => {
-      if (active && count !== null) {
-        setVisitCount(count);
+      if (active) {
+        setVisitCount((prev) => Math.max(count, prev));
       }
     });
     return () => {
       active = false;
     };
   }, []);
-
-  if (visitCount === null) return null;
 
   const formattedCount = visitCount.toLocaleString('en-IN');
 
