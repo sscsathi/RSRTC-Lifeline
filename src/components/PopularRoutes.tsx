@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeftRight, ArrowRight, ChevronRight } from 'lucide-react';
 import { POPULAR_ROUTES, PopularRoute } from '../data/rsrtcData';
+import { VisitorCounter } from './VisitorCounter';
 
 interface PopularRoutesProps {
   onSelectRoute: (route: PopularRoute) => void;
@@ -71,6 +72,8 @@ export const PopularRoutes: React.FC<PopularRoutesProps> = ({ onSelectRoute }) =
           </button>
         ))}
       </div>
+
+      <VisitorCounter />
 
       <p className="mt-8 pt-6 border-t border-[#EAECEF] text-xs sm:text-sm text-slate-500 text-center leading-relaxed">
         Timings and routes are indicative and subject to change; please verify at the bus stand/depot before travel.
