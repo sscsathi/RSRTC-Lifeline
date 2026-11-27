@@ -55,7 +55,8 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
             <h2 className="text-base sm:text-lg font-extrabold truncate mt-0.5">
               {bus.fromCity.name} → {bus.toCity.name}{' '}
               <span className="font-mono font-semibold text-sm text-white/90 ml-1">
-                ({bus.departureTime} – {bus.arrivalTime})
+                ({bus.departureTime} – {bus.arrivalTime}
+                {bus.departureMins + bus.durationMinutes >= 1440 ? ' (+1)' : ''})
               </span>
             </h2>
           </div>
@@ -121,7 +122,10 @@ export const TimetableBookingModal: React.FC<TimetableBookingModalProps> = ({
                           Boarding opens {stop.arrivalTime} · Departs {stop.departureTime}
                         </span>
                       ) : (
-                        <span>Scheduled Arrival {stop.arrivalTime}</span>
+                        <span>
+                          Scheduled Arrival {stop.arrivalTime}
+                          {bus.departureMins + bus.durationMinutes >= 1440 ? ' (+1)' : ''}
+                        </span>
                       )}
                     </div>
                   </div>

@@ -318,6 +318,11 @@ export const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                     <div className="shrink-0 text-right">
                       <p className="text-xl sm:text-2xl font-extrabold text-slate-900 tabular-nums leading-none">
                         {bus.arrivalTime}
+                        {bus.departureMins + bus.durationMinutes >= 1440 && (
+                          <span className="text-[11px] font-bold text-[#C2185B] ml-1">
+                            (+1)
+                          </span>
+                        )}
                       </p>
                       <p className="text-xs font-semibold text-slate-700 mt-1.5">
                         {bus.toCity.name}

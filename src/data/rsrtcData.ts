@@ -952,6 +952,54 @@ export const EXTENDED_CORRIDORS: CorridorSchedule[] = [
   },
 ];
 
+export const DEEG_TO_MATHURA_ROUTES: RawDatasetRoute[] = [
+  { id: 'RSRTC-DEG-MTR-01', from: 'Deeg', to: 'Mathura', via: '', departure: '07:00 AM', arrival: '08:00 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-02', from: 'Deeg', to: 'Mathura', via: '', departure: '07:45 AM', arrival: '08:45 AM', duration: '1h 00m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-DEG-MTR-03', from: 'Deeg', to: 'Mathura', via: '', departure: '07:50 AM', arrival: '08:50 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-04', from: 'Deeg', to: 'Mathura', via: '', departure: '08:10 AM', arrival: '09:20 AM', duration: '1h 10m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-05', from: 'Deeg', to: 'Mathura', via: '', departure: '08:45 AM', arrival: '09:45 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-06', from: 'Deeg', to: 'Mathura', via: '', departure: '09:00 AM', arrival: '10:00 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-07', from: 'Deeg', to: 'Mathura', via: '', departure: '09:15 AM', arrival: '10:15 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-08', from: 'Deeg', to: 'Mathura', via: '', departure: '09:40 AM', arrival: '10:40 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-09', from: 'Deeg', to: 'Mathura', via: '', departure: '10:15 AM', arrival: '11:15 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-10', from: 'Deeg', to: 'Mathura', via: '', departure: '11:00 AM', arrival: '12:00 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-11', from: 'Deeg', to: 'Mathura', via: '', departure: '11:35 AM', arrival: '12:35 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-12', from: 'Deeg', to: 'Mathura', via: '', departure: '01:10 PM', arrival: '02:10 PM', duration: '1h 00m', type: 'Ordinary', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-13', from: 'Deeg', to: 'Mathura', via: '', departure: '01:40 PM', arrival: '02:40 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-14', from: 'Deeg', to: 'Mathura', via: '', departure: '02:10 PM', arrival: '03:10 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-15', from: 'Deeg', to: 'Mathura', via: '', departure: '03:00 PM', arrival: '04:00 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-16', from: 'Deeg', to: 'Mathura', via: '', departure: '04:30 PM', arrival: '05:30 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-17', from: 'Deeg', to: 'Mathura', via: '', departure: '05:40 PM', arrival: '06:40 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-18', from: 'Deeg', to: 'Mathura', via: '', departure: '07:00 PM', arrival: '08:00 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-19', from: 'Deeg', to: 'Mathura', via: '', departure: '08:00 PM', arrival: '09:00 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-20', from: 'Deeg', to: 'Mathura', via: '', departure: '08:45 PM', arrival: '09:45 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-DEG-MTR-21', from: 'Deeg', to: 'Mathura', via: '', departure: '11:30 PM', arrival: '12:30 AM (+1)', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+];
+
+export const MATHURA_TO_DEEG_ROUTES: RawDatasetRoute[] = [
+  { id: 'RSRTC-MTR-DEG-01', from: 'Mathura', to: 'Deeg', via: '', departure: '04:30 AM', arrival: '05:25 AM', duration: '55m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-02', from: 'Mathura', to: 'Deeg', via: '', departure: '05:30 AM', arrival: '06:30 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-03', from: 'Mathura', to: 'Deeg', via: '', departure: '06:00 AM', arrival: '07:00 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-04', from: 'Mathura', to: 'Deeg', via: '', departure: '08:30 AM', arrival: '09:30 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-05', from: 'Mathura', to: 'Deeg', via: '', departure: '09:00 AM', arrival: '10:00 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-06', from: 'Mathura', to: 'Deeg', via: '', departure: '09:45 AM', arrival: '10:45 AM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-07', from: 'Mathura', to: 'Deeg', via: '', departure: '11:00 AM', arrival: '12:00 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-08', from: 'Mathura', to: 'Deeg', via: '', departure: '12:10 PM', arrival: '01:10 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-09', from: 'Mathura', to: 'Deeg', via: '', departure: '12:50 PM', arrival: '01:50 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-10', from: 'Mathura', to: 'Deeg', via: '', departure: '01:30 PM', arrival: '02:30 PM', duration: '1h 00m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-MTR-DEG-11', from: 'Mathura', to: 'Deeg', via: '', departure: '01:30 PM', arrival: '02:30 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-12', from: 'Mathura', to: 'Deeg', via: '', departure: '02:50 PM', arrival: '03:50 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-13', from: 'Mathura', to: 'Deeg', via: '', departure: '03:10 PM', arrival: '04:10 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-14', from: 'Mathura', to: 'Deeg', via: '', departure: '03:30 PM', arrival: '04:30 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-15', from: 'Mathura', to: 'Deeg', via: '', departure: '04:00 PM', arrival: '04:55 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-16', from: 'Mathura', to: 'Deeg', via: '', departure: '04:15 PM', arrival: '05:15 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-17', from: 'Mathura', to: 'Deeg', via: '', departure: '04:30 PM', arrival: '05:30 PM', duration: '1h 00m', type: 'Express', depot: 'Lohagarh Depot' },
+  { id: 'RSRTC-MTR-DEG-18', from: 'Mathura', to: 'Deeg', via: '', departure: '04:45 PM', arrival: '05:45 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-19', from: 'Mathura', to: 'Deeg', via: '', departure: '05:00 PM', arrival: '05:55 PM', duration: '55m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-20', from: 'Mathura', to: 'Deeg', via: '', departure: '05:15 PM', arrival: '06:15 PM', duration: '1h 00m', type: 'Express', depot: 'Alwar Depot' },
+  { id: 'RSRTC-MTR-DEG-21', from: 'Mathura', to: 'Deeg', via: '', departure: '06:30 PM', arrival: '07:25 PM', duration: '55m', type: 'Express', depot: 'Alwar Depot' },
+];
+
 export const POPULAR_ROUTES: PopularRoute[] = [
   {
     id: 'jpr-btp',
@@ -1183,7 +1231,8 @@ function buildEndpointStops(
   depMins: number,
   durationMinutes: number,
   distanceKm: number,
-  platformIndex: number
+  platformIndex: number,
+  arrivalTimeOverride?: string
 ): RouteStop[] {
   return [
     {
@@ -1198,7 +1247,7 @@ function buildEndpointStops(
     {
       stopName: toCity.name,
       stand: toCity.stand,
-      arrivalTime: formatMinsTo12h(depMins + durationMinutes),
+      arrivalTime: arrivalTimeOverride ?? formatMinsTo12h(depMins + durationMinutes),
       departureTime: 'Terminates',
       haltMins: 0,
       distanceKm,
@@ -1244,6 +1293,11 @@ function createBusFromRaw(
       ? 'RJ-14-TD'
       : 'RJ-14-PA';
 
+  const arrivalTimeStr =
+    overrideDepMins === undefined && raw.arrival
+      ? raw.arrival.replace(/\s*\(\+1\)/i, '').trim()
+      : formatMinsTo12h(arrMins);
+
   return {
     id: `${raw.id}${overrideIdSuffix ? `-${overrideIdSuffix}` : ''}-${dateIso}`,
     busNumber: `${series}-${1400 + (seed % 8200)}`,
@@ -1257,7 +1311,7 @@ function createBusFromRaw(
     isDirectDataset: true,
     isConnecting: false,
     departureTime: formatMinsTo12h(depMins),
-    arrivalTime: formatMinsTo12h(arrMins),
+    arrivalTime: arrivalTimeStr,
     departureMins: depMins,
     durationMinutes,
     durationLabel: raw.duration,
@@ -1272,7 +1326,8 @@ function createBusFromRaw(
       depMins,
       durationMinutes,
       distanceKm,
-      seed
+      seed,
+      arrivalTimeStr
     ),
     onTimePercent: 92 + (seed % 7),
   };
@@ -1366,6 +1421,20 @@ export function generateBusSchedules(
   const toCity = findCityById(toId);
 
   if (!fromCity || !toCity || fromCity.id === toCity.id) return [];
+
+  // Strict one-way schedule for Deeg -> Mathura (21 exact buses, no duplicates or fallback additions)
+  if (fromCity.id === 'deeg' && toCity.id === 'mathura') {
+    return DEEG_TO_MATHURA_ROUTES.map((raw) =>
+      createBusFromRaw(raw, fromCity, toCity, dateIso)
+    ).sort((a, b) => a.departureMins - b.departureMins);
+  }
+
+  // Strict one-way schedule for Mathura -> Deeg (21 exact buses, no duplicates or fallback additions)
+  if (fromCity.id === 'mathura' && toCity.id === 'deeg') {
+    return MATHURA_TO_DEEG_ROUTES.map((raw) =>
+      createBusFromRaw(raw, fromCity, toCity, dateIso)
+    ).sort((a, b) => a.departureMins - b.departureMins);
+  }
 
   // 0. Bidirectional matches from merged EXTENDED_CORRIDORS
   const matchingCorridors = EXTENDED_CORRIDORS.filter(
